@@ -1,4 +1,4 @@
-# Copyright (C) 2018  Christian Berger
+# Copyright (C) 2019  Christian Berger
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 version: '2.3'
 services:
     frame-feed-evaluator:
-        container_name: frame-feed-evaluator
+        container_name: ffe
         build:
             context: https://github.com/chrberger/frame-feed-evaluator.git#v0.0.2
             dockerfile: Dockerfile.amd64
@@ -25,11 +25,11 @@ services:
         volumes:
         - /tmp:/tmp
         - $PWD:/host
-        - $PWD/pngs:/pngs
+        - $PWD/example:/pngs
         working_dir: /host
         environment:
         - DISPLAY=$DISPLAY
-        command: "--folder=/pngs --cid=111 --name=video0 --report=output.csv --crop.x=320 --crop.y=240 --crop.width=640 --crop.height=480 --delay=0"
+        command: "--folder=/pngs --report=ffe-openh264.csv --cid=111 --name=video0 --crop.x=376 --crop.y=32 --crop.width=640 --crop.height=480 --delay=0"
 
     video-h264-encoder-amd64:
         container_name: openh264
