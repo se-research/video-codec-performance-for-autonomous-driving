@@ -29,17 +29,17 @@ services:
         working_dir: /host
         environment:
         - DISPLAY=$DISPLAY
-        command: "--folder=/pngs --report=ffe-openh264.csv --cid=111 --name=video0 --crop.x=376 --crop.y=32 --crop.width=640 --crop.height=480 --delay=0"
+        command: "--folder=/pngs --report=ffe-vp8.csv --cid=111 --name=video0 --crop.x=376 --crop.y=32 --crop.width=640 --crop.height=480 --delay=0"
 
-    video-h264-encoder-amd64:
-        container_name: openh264
+    video-vp8-encoder-amd64:
+        container_name: vp8
         depends_on:
         - frame-feed-evaluator
         build:
-            context: https://github.com/chalmers-revere/opendlv-video-h264-encoder.git#v0.0.1
+            context: https://github.com/chalmers-revere/opendlv-video-vpx-encoder.git#v0.0.7
             dockerfile: Dockerfile.amd64
         network_mode: "host"
         ipc: "host"
         volumes:
         - /tmp:/tmp
-        command: "--cid=111 --name=video0 --width=640 --height=480"
+        command: "--cid=111 --name=video0 --width=640 --height=480 --vp8 --bitrate=100000 --verbose"

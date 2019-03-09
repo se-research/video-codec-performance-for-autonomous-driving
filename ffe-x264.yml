@@ -18,7 +18,7 @@ services:
     frame-feed-evaluator:
         container_name: ffe
         build:
-            context: https://github.com/chrberger/frame-feed-evaluator.git#v0.0.2
+            context: https://github.com/chrberger/frame-feed-evaluator.git#v0.0.3
             dockerfile: Dockerfile.amd64
         network_mode: "host"
         ipc: "host"
