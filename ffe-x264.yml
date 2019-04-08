@@ -29,7 +29,7 @@ services:
         working_dir: /host
         environment:
         - DISPLAY=$DISPLAY
-        command: "--folder=/pngs --report=ffe-x264.csv --cid=111 --name=video0 --crop.x=376 --crop.y=32 --crop.width=640 --crop.height=480 --delay=0"
+        command: "--folder=/pngs --report=ffe-rural_road_day_sunny-x264-vga-c1.csv --cid=111 --name=video0 --crop.x=376 --crop.y=32 --crop.width=640 --crop.height=480 --delay=0"
 
     video-x264-encoder-amd64:
         container_name: x264
