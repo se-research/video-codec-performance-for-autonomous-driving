@@ -53,12 +53,11 @@ for file in files:
     #Adding the different resoulutions
     # and configs to resolution_list & config_list
     tmp = file.split('-')
-    scenario = tmp[1]
+    scenario = tmp[1].replace('_', ' ')
     codec = tmp[2]
     resolutions.append(tmp[3])
     substring = tmp[4]
     substring = substring[:-4]
-    print(substring)
     configs.append(substring)
 
 # Todo: Choose correct scenario name.
@@ -173,4 +172,4 @@ for r in resolutions:
 
 plt.xticks(np.arange(2, x_width, step=3), resolution_and_configs)
 # plt.show()
-plt.savefig(scenario + '-' + codec + '.png')
+plt.savefig(scenario.replace(' ', '_') + '-' + codec + '.png')
