@@ -175,6 +175,7 @@ def run(reports, graph_path):
     plt.xticks(np.arange(2, x_width, step=3), resolution_and_configs)
     # plt.show()
 
+    print(graph_path)
     if os.path.isdir(graph_path):
         plt.savefig(graph_path + '/' + scenario.replace(' ', '_') + '-' + codec + '.png')
     else:
@@ -182,5 +183,5 @@ def run(reports, graph_path):
             os.mkdir(graph_path)
             plt.savefig(graph_path + '/' + scenario.replace(' ', '_') + '-' + codec + '.png')
         except Exception as e:
-            print ("Creation of the directory %s failed. Saving graph in the same folder as the script. " + e % path)
+            print ("Creation of the dir %s failed. Saving graph in the same folder as the script. " + e % graph_path)
             plt.savefig(scenario.replace(' ', '_') + '-' + codec + '.png')

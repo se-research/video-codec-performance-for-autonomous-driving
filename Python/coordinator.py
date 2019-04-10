@@ -1,7 +1,8 @@
 import docker
 import threading
-import time
 import plot_generator
+import os
+import sys
 
 REPO_FFE = 'https://github.com/chrberger/frame-feed-evaluator.git'
 REPO_X264 = 'https://github.com/chalmers-revere/opendlv-video-x264-encoder.git'
@@ -45,13 +46,12 @@ def calculate_crop_y():
 
 
 #######################################################  FFE  ##########################################################
-
-PNGS_PATH = '/home/erik/Desktop/Thesis/video-codec-performance-for-autonomous-driving/2019-03-22_AstaZero_RuralRoad/'
-REPORT_PATH = '/home/erik/Desktop/coordinator/video-codec-eval-coordinator/reports'
-GRAPH_PATH = '/home/erik/Desktop/coordinator/video-codec-eval-coordinator/graphs'
+PNGS_PATH = os.path.join(os.getcwd(), '../2019-03-22_AstaZero_RuralRoad')
+OUTPUT_REPORT_PATH = os.path.join(os.getcwd(), 'reports')
+OUTPUT_GRAPH_PATH = os.path.join(os.getcwd(), 'graphs')
 
 VOLUMES_FFE = {'/tmp/': {'bind': '/tmp', 'mode': 'rw'},
-               REPORT_PATH: {'bind': '/host', 'mode': 'rw'},
+               OUTPUT_REPORT_PATH: {'bind': '/host', 'mode': 'rw'},
                PNGS_PATH: {
                    'bind': '/pngs',
                    'mode': 'rw'}
@@ -186,4 +186,4 @@ for (i, res) in enumerate(RESOLUTIONS):
     report_name = 'ffe-AstaZero_Rural_Road-h264-' + res[0] + '-C1.csv'
     reports.append('reports/' + report_name)
 
-plot_generator.run(reports, GRAPH_PATH)
+plot_generator.run(reports, OUTPUT_GRAPH_PATH)
