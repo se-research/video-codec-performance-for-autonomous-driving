@@ -1,6 +1,7 @@
 import docker
 import threading
 import time
+import plot_generator
 
 REPO_FFE = 'https://github.com/chrberger/frame-feed-evaluator.git'
 REPO_X264 = 'https://github.com/chalmers-revere/opendlv-video-x264-encoder.git'
@@ -46,7 +47,8 @@ def calculate_crop_y():
 #######################################################  FFE  ##########################################################
 
 PNGS_PATH = '/home/erik/Desktop/Thesis/video-codec-performance-for-autonomous-driving/2019-03-22_AstaZero_RuralRoad/'
-REPORT_PATH = '/home/erik/Desktop/coordinator'
+REPORT_PATH = '/home/erik/Desktop/coordinator/video-codec-eval-coordinator/reports'
+GRAPH_PATH = '/home/erik/Desktop/coordinator/video-codec-eval-coordinator/graphs'
 
 VOLUMES_FFE = {'/tmp/': {'bind': '/tmp', 'mode': 'rw'},
                REPORT_PATH: {'bind': '/host', 'mode': 'rw'},
@@ -89,6 +91,7 @@ def print_logs(log_generator, color):
         print('\033[' + color + 'm### \033[0m' + (str(x, 'utf-8')))  # Prints with color code prefix and in utf-8
 
 
+'''
 client = docker.from_env()
 
 
@@ -139,8 +142,10 @@ thread_build_encoder.start()
 thread_build_ffe.join()  # Blocks execution until both threads has terminated
 thread_build_encoder.join()
 
+reports = []
 for (i, res) in enumerate(RESOLUTIONS):
     report_name = 'ffe-AstaZero_Rural_Road-h264-' + res[0] + '-C1.csv'
+    reports.append('reports/' + report_name)
     width = res[1]
     height = res[2]
 
@@ -174,5 +179,12 @@ for (i, res) in enumerate(RESOLUTIONS):
     thread_logs_ffe.start()
     thread_logs_encoder.start()
 
-    thread_logs_ffe.join() # @TODO  Change to have the actual containers, encoder and ffe, blocking
+    thread_logs_ffe.join()  # @TODO  Change to have the actual containers, encoder and ffe, blocking
     thread_logs_encoder.join()
+'''
+reports = []
+for (i, res) in enumerate(RESOLUTIONS):
+    report_name = 'ffe-AstaZero_Rural_Road-h264-' + res[0] + '-C1.csv'
+    reports.append('reports/' + report_name)
+
+plot_generator.run(reports, GRAPH_PATH)
