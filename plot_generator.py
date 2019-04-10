@@ -60,12 +60,11 @@ for file in files:
     substring = substring[:-4]
     configs.append(substring)
 
-# Todo: Choose correct scenario name.
 ax.set_title(scenario + ': ' + codec)
 
-ax.set_ylabel('ssim')
-par1.set_ylabel('size')
-par2.set_ylabel('time')
+ax.set_ylabel('ssim', color='#ee0000')
+par1.set_ylabel('size', color='#00ee00')
+par2.set_ylabel('time', color='#0000ee')
 
 position_x = [[], [], []]
 ssim_x = 1
@@ -96,14 +95,14 @@ for i, file in enumerate(files):
         tmp_size = []
         tmp_time = []
 
-ssim_boxes = ax.boxplot(y_ssim, positions=position_x[0], showfliers=False, whis=[0, 100], patch_artist=True)
-size_boxes = par1.boxplot(y_size, positions=position_x[1], showfliers=False, whis=[0, 100], patch_artist=True)
-time_boxes = par2.boxplot(y_time, positions=position_x[2], showfliers=False, whis=[0, 100], patch_artist=True)
+ssim_boxes = ax.boxplot(y_ssim, positions=position_x[0], showfliers=False, patch_artist=True)
+size_boxes = par1.boxplot(y_size, positions=position_x[1], showfliers=False, patch_artist=True)
+time_boxes = par2.boxplot(y_time, positions=position_x[2], showfliers=False, patch_artist=True)
 
 def colorize_boxes(boxes, color, linecolor):
     for box in boxes['boxes']:
         # change outline color
-        box.set(color = color, linewidth=1)
+        box.set(color = color, linewidth=1, alpha=0.7)
         # change fill color
         box.set(facecolor = linecolor)
 
@@ -144,9 +143,9 @@ def plot_min_max_with_fill(x_positions, ax, metric_dict, median_line, color):
     return d
 
 # Fill with colors.
-colorize_boxes(ssim_boxes, '#aa0000', '#cc0000')
-colorize_boxes(size_boxes, '#00aa00', '#00cc00')
-colorize_boxes(time_boxes, '#0000aa', '#0000cc')
+colorize_boxes(ssim_boxes, '#cc0000', '#aa0000')
+colorize_boxes(size_boxes, '#00cc00', '#00aa00')
+colorize_boxes(time_boxes, '#0000cc', '#0000aa')
 
 # Get median, min and max.
 ssim_metric_dict = get_metrics(y_ssim)
@@ -166,9 +165,11 @@ x_width = position_x[2][-1] + 1
 plt.xlim([0, x_width])
 
 resolution_and_configs = []
-for r in resolutions:
-    for c in configs:
-        resolution_and_configs.append(r.upper() + '\n' + c)
+for i, r in enumerate(resolutions):
+    resolution_and_configs.append(r + '\n')
+
+for i, c in enumerate(configs):
+    resolution_and_configs[i] += c
 
 plt.xticks(np.arange(2, x_width, step=3), resolution_and_configs)
 # plt.show()
