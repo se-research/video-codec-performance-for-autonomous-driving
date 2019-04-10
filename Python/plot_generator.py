@@ -183,5 +183,4 @@ def run(reports, graph_path):
             plt.savefig(graph_path + '/' + scenario.replace(' ', '_') + '-' + codec + '.png')
         except Exception as e:
             print ("Creation of the directory %s failed. Saving graph in the same folder as the script. " + e % path)
-        else:
             plt.savefig(scenario.replace(' ', '_') + '-' + codec + '.png')

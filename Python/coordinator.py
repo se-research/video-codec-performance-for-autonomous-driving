@@ -91,7 +91,6 @@ def print_logs(log_generator, color):
         print('\033[' + color + 'm### \033[0m' + (str(x, 'utf-8')))  # Prints with color code prefix and in utf-8
 
 
-'''
 client = docker.from_env()
 
 
@@ -181,7 +180,7 @@ for (i, res) in enumerate(RESOLUTIONS):
 
     thread_logs_ffe.join()  # @TODO  Change to have the actual containers, encoder and ffe, blocking
     thread_logs_encoder.join()
-'''
+
 reports = []
 for (i, res) in enumerate(RESOLUTIONS):
     report_name = 'ffe-AstaZero_Rural_Road-h264-' + res[0] + '-C1.csv'
