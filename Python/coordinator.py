@@ -262,7 +262,7 @@ def objective_h264(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_stra
                 '--crop.width=' + width,
                 '--crop.height=' + height,
                 '--delay=0',
-                '--delay.start=150',
+                '--delay.start=200',
                 '--stopafter=' + str(STOP_AFTER),
                 # '--noexitontimeout'
                 # '--verbose',
@@ -390,15 +390,29 @@ if __name__ == '__main__':
         best_parameters = []
         i = 0
         for value in minimize_results.x:
-            best_parameters.append(param_list_h264[i] + ': ' + str(value))
+            best_parameters.append(param_list_h264[i] + ': ' + str(value) + '\n')
             print(param_list_h264[i] + ': ' + str(value))  # prints parameters that obtained the highest SSIM
             i += 1
         print("Best config: " + best_config)
         print("It took: ", str((now - start) / 60), " minutes")
 
-        plot_convergence(minimize_results)
-        plt.show()
 
+        ax = plot_convergence(minimize_results)
+        ax.set_ylim(top = 1, bottom = 0)
+        ax.set_title('AstaZero_Rural_Road-' + TAG_ENCODER + '-' + res[0])
+        OUTPUT_CONVERGENCE_PATH = os.path.join(os.getcwd(), 'convergence')
+
+        if os.path.isdir(OUTPUT_CONVERGENCE_PATH):
+            plt.savefig(OUTPUT_CONVERGENCE_PATH + '/' + 'AstaZero_Rural_Road-' + TAG_ENCODER + '-' + res[0] + '.png')
+        else:
+            try:
+                os.mkdir(OUTPUT_CONVERGENCE_PATH)
+                plt.savefig(OUTPUT_CONVERGENCE_PATH + '/' + 'AstaZero_Rural_Road-' + TAG_ENCODER + '-' + res[0] + '.png')
+            except Exception as e:
+                print ("Creation of the dir %s failed. Saving graph in the same folder as the script. " + e % OUTPUT_CONVERGENCE_PATH)
+                plt.savefig(OUTPUT_CONVERGENCE_PATH + '/' + 'AstaZero_Rural_Road-' + TAG_ENCODER + '-' + res[0] + '.png')
+
+        plt.clf()
         reports.append('reports/' + best_config)
 
         # Saves the best parameter config combo in OUTPUT_BEST_CONFIG_REPORT_PATH, creates dir if not already exists
