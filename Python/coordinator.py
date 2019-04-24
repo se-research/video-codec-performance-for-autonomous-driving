@@ -397,7 +397,7 @@ if __name__ == '__main__':
         print("It took: ", str((now - start) / 60), " minutes")
 
         plot_convergence(minimize_results)
-        plt.show()
+        plt.show(block=False)
 
         reports.append('reports/' + best_config)
 
