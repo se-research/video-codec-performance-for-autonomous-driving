@@ -396,7 +396,6 @@ if __name__ == '__main__':
         print("Best config: " + best_config)
         print("It took: ", str((now - start) / 60), " minutes")
 
-
         ax = plot_convergence(minimize_results)
         ax.set_ylim(top = 1, bottom = 0)
         ax.set_title('AstaZero_Rural_Road-' + TAG_ENCODER + '-' + res[0])
