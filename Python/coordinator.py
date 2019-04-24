@@ -106,6 +106,7 @@ def calculate_crop_y():
 PNGS_PATH = os.path.join(os.getcwd(), '../2019-03-22_AstaZero_RuralRoad')
 OUTPUT_REPORT_PATH = os.path.join(os.getcwd(), 'reports')
 OUTPUT_GRAPH_PATH = os.path.join(os.getcwd(), 'graphs')
+OUTPUT_BEST_CONFIG_REPORT_PATH = os.path.join(os.getcwd(), 'best_configs_report')
 
 VOLUMES_FFE = {'/tmp/': {'bind': '/tmp', 'mode': 'rw'},
                OUTPUT_REPORT_PATH: {'bind': '/host', 'mode': 'rw'},
@@ -376,7 +377,7 @@ if __name__ == '__main__':
 
         start = time.time()
         minimize_results = gp_minimize(func=objective_h264, dimensions=space_h264, base_estimator=None,
-                                       n_calls=10, n_random_starts=10,
+                                       n_calls=100, n_random_starts=10,
                                        acq_func="gp_hedge", acq_optimizer="auto", x0=None, y0=None,
                                        random_state=None, verbose=True, callback=None,
                                        n_points=10000, n_restarts_optimizer=5, xi=0.01, kappa=1.96,
@@ -386,7 +387,7 @@ if __name__ == '__main__':
         print("Best score=%.4f" % minimize_results.fun)
         print("Best parameters:")
 
-        best_parameters=[]
+        best_parameters = []
         i = 0
         for value in minimize_results.x:
             best_parameters.append(param_list_h264[i] + ': ' + str(value))
@@ -399,9 +400,19 @@ if __name__ == '__main__':
         plt.show()
 
         reports.append('reports/' + best_config)
-        best_config_file = open(OUTPUT_REPORT_PATH + '/' + best_config + '-best-config', 'w')  # opens/creates file
 
-        best_config_file.writelines(best_parameters)
+        # Saves the best parameter config combo in OUTPUT_BEST_CONFIG_REPORT_PATH, creates dir if not already exists
+        if os.path.isdir(OUTPUT_BEST_CONFIG_REPORT_PATH):
+            best_config_file = open(OUTPUT_BEST_CONFIG_REPORT_PATH + '/' + best_config, 'w')  # opens/creates file
+            best_config_file.writelines(best_parameters)
+            print("Best parameters saved: " + OUTPUT_BEST_CONFIG_REPORT_PATH + '/' + best_config)
+        else:
+            try:
+                os.mkdir(OUTPUT_BEST_CONFIG_REPORT_PATH)
+                best_config_file = open(OUTPUT_BEST_CONFIG_REPORT_PATH + '/' + best_config, 'w')  # opens/creates file
+                best_config_file.writelines(best_parameters)
+                print("Best parameters saved: " + OUTPUT_BEST_CONFIG_REPORT_PATH + '/' + best_config)
+            except Exception as e:
+                print("Creation of the dir %s failed. " + e % OUTPUT_BEST_CONFIG_REPORT_PATH)
 
-        print("Best parameters saved in: " + OUTPUT_REPORT_PATH + '/' + best_config + '-best-config')
     plot_generator.run(reports, OUTPUT_GRAPH_PATH)
