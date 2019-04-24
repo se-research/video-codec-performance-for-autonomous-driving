@@ -220,8 +220,8 @@ space_h264 = [Integer(100000, 1500000, name='bitrate'),
               Integer(0, 1, name='prefix_nal'),
               Integer(0, 1, name='entropy_coding'),
               Integer(0, 1, name='frame_skip'),
-              Integer(32, 51, name='qp_max'),  # change
-              Integer(7, 17, name='qp_min'),  # change
+              Integer(0, 51, name='qp_max'),  # fix
+              Integer(0, 50, name='qp_min'),  # fix
               Integer(0, 1, name='long_term_ref'),
               Integer(0, 2, name='loop_filter'),
               Integer(0, 1, name='denoise'),
@@ -376,7 +376,7 @@ if __name__ == '__main__':
 
         start = time.time()
         minimize_results = gp_minimize(func=objective_h264, dimensions=space_h264, base_estimator=None,
-                                       n_calls=100, n_random_starts=10,
+                                       n_calls=10, n_random_starts=10,
                                        acq_func="gp_hedge", acq_optimizer="auto", x0=None, y0=None,
                                        random_state=None, verbose=True, callback=None,
                                        n_points=10000, n_restarts_optimizer=5, xi=0.01, kappa=1.96,
@@ -385,8 +385,11 @@ if __name__ == '__main__':
 
         print("Best score=%.4f" % minimize_results.fun)
         print("Best parameters:")
+
+        best_parameters=[]
         i = 0
         for value in minimize_results.x:
+            best_parameters.append(param_list_h264[i] + ': ' + str(value))
             print(param_list_h264[i] + ': ' + str(value))  # prints parameters that obtained the highest SSIM
             i += 1
         print("Best config: " + best_config)
@@ -394,6 +397,11 @@ if __name__ == '__main__':
 
         plot_convergence(minimize_results)
         plt.show()
-        reports.append('reports/' + best_config)
 
+        reports.append('reports/' + best_config)
+        best_config_file = open(OUTPUT_REPORT_PATH + '/' + best_config + '-best-config', 'w')  # opens/creates file
+
+        best_config_file.writelines(best_parameters)
+
+        print("Best parameters saved in: " + OUTPUT_REPORT_PATH + '/' + best_config + '-best-config')
     plot_generator.run(reports, OUTPUT_GRAPH_PATH)
