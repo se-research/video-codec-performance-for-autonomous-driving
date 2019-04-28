@@ -8,6 +8,8 @@ from skopt.plots import plot_convergence
 import matplotlib.pyplot as plt
 import plot_generator
 import utilities
+import H264
+import FFE
 
 REPO_X264_FULL = 'https://github.com/guslauer/opendlv-video-x264-encoder.git'
 REPO_VPX_FULL = 'https://github.com/jeberlen/opendlv-video-vpx-encoder.git'
@@ -110,14 +112,14 @@ def get_list_encoder_vp9_full():
 def build(docker_client, encoder):
     def build_ffe():
         try:
-            docker_client.images.get(utilities.FFE.TAG)
-            print('Found ' + utilities.FFE.TAG + ' image locally')
+            docker_client.images.get(FFE.TAG)
+            print('Found ' + FFE.TAG + ' image locally')
         except docker.errors.ImageNotFound:
             print(
-                'Building ' + utilities.FFE.TAG + ' from ' + utilities.FFE.REPO + '#' + utilities.FFE.VERSION + '. It may take some time...')
-            image = docker_client.images.build(path=utilities.FFE.REPO + '#' + utilities.FFE.VERSION,
+                'Building ' + FFE.TAG + ' from ' + FFE.REPO + '#' + FFE.VERSION + '. It may take some time...')
+            image = docker_client.images.build(path=FFE.REPO + '#' + FFE.VERSION,
                                                dockerfile='Dockerfile.amd64',
-                                               tag=utilities.FFE.TAG,
+                                               tag=FFE.TAG,
                                                rm=True,
                                                forcerm=True
                                                )
@@ -159,7 +161,7 @@ def build(docker_client, encoder):
 if __name__ == '__main__':
     docker_client = docker.from_env()
 
-    encoders = [utilities.H264()] #x264, VPX]
+    encoders = [H264] #x264, VPX]
 
     for encoder in encoders:
         build(docker_client, {'TAG': encoder.TAG, 'REPO': encoder.REPO, 'VERSION': encoder.VERSION})
@@ -171,12 +173,14 @@ if __name__ == '__main__':
             height = res[2]
             resolution = RESOLUTIONS[0]
 
-            encoder = utilities.H264(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, resolution=res, config=config,
-                                     docker_client=docker_client)
+            report_name = utilities.generate_report_name(tag = encoder.TAG, resolution_name = resolution_name, config = config)
+            config += 1
+            
+            encoder.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, resolution=res, config=config,
+                            docker_client=docker_client, report_name = report_name)
+            FFE.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, width=width, height=height, report_name=report_name)
 
-            print(encoder.SPACE)
             start = time.time()
-
             minimize_results = gp_minimize(func=encoder.objective,
                                            dimensions=encoder.SPACE,
                                            base_estimator=None,
