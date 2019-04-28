@@ -158,6 +158,10 @@ def build(docker_client, encoder):
     thread_build_encoder.join()
 
 
+def minimize_callback(result):
+    global config
+    config += 1
+
 if __name__ == '__main__':
     docker_client = docker.from_env()
 
@@ -179,9 +183,9 @@ if __name__ == '__main__':
                             docker_client=docker_client, report_name = report_name)
             FFE.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, width=width, height=height, report_name=report_name)
 
-            config += 1
-
             start = time.time()
+            default_config = encoder.get_default_encoder_config()
+            print(str(default_config))
             minimize_results = gp_minimize(func=encoder.objective,
                                            dimensions=encoder.SPACE,
                                            base_estimator=None,
@@ -193,7 +197,7 @@ if __name__ == '__main__':
                                            y0=None,
                                            random_state=None,
                                            verbose=True,
-                                           callback=None,
+                                           callback=minimize_callback,
                                            n_points=10000,
                                            n_restarts_optimizer=5,
                                            xi=0.01,
