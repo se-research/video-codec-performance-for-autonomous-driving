@@ -29,7 +29,7 @@ def log_helper(log_generator, color):
     for x in log_generator:
         print('\033[' + color + 'm### \033[0m' + (str(x, 'utf-8')))  # Prints with color code prefix and in utf-8
         if x == TIMED_OUT_MSG_BYTES:
-            global TIMED_OUT
+            # global TIMED_OUT
             TIMED_OUT = 1
 
 

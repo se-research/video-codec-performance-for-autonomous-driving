@@ -4,6 +4,7 @@ import threading
 import csv
 import utilities
 import FFE
+import coordinator
     
 _local_variables = {}
 
@@ -83,8 +84,7 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
             prefix_nal, entropy_coding, frame_skip, qp_max, qp_min, long_term_ref, loop_filter, denoise,
             background_detection, adaptive_quant, frame_cropping, scene_change_detect, padding):
 
-    global TIMED_OUT
-    TIMED_OUT = 0  # resets violation variable
+    utilities.TIMED_OUT = 0  # resets violation variable
 
     try:  # try/catch to catch when the containers crash due to illegal parameter combination
         def get_list_encoder():
@@ -127,7 +127,6 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
                                                         detach=True,
                                                         )
 
-        print('list encoder: ' + str(_local_variables) + ', TAG: ' + TAG)
         container_encoder = _local_variables['docker_client'].containers.run(TAG,
                                                             command=get_list_encoder(),
                                                             volumes={'/tmp': {'bind': '/tmp', 'mode': 'rw'}},
@@ -157,13 +156,11 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
             print(e)
             return 1  # returns 1 as SSIM in case of crash (inverted due to minimization algorithm)
 
-    if TIMED_OUT:  # FFE timed out due to size or compression time constraint violated
+    if utilities.TIMED_OUT:  # FFE timed out due to size or compression time constraint violated
         print("TIMED OUT")
         return 1  # returns 1 (inverted due to minimization algorithm)
 
     file = open(utilities.OUTPUT_REPORT_PATH + '/' + _local_variables['report_name'], 'r')  # opens report generated
-
-    print(str(file))
     plots = csv.reader(file, delimiter=';')
     sum = 0
     length = 0
@@ -174,7 +171,7 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
     avg = sum / length  # computes SSIM average
 
     if avg > utilities.max_ssim:  # if the new mean ssim is the best so far, update max_ssim and best_config variables
-        max_ssim = avg
+        utilities.max_ssim = avg
         global best_config
         best_config = _local_variables['report_name']
 

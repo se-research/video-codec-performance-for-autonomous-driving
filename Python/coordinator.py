@@ -174,12 +174,14 @@ if __name__ == '__main__':
             resolution = RESOLUTIONS[0]
 
             report_name = utilities.generate_report_name(tag = encoder.TAG, resolution_name = resolution_name, config = config)
-            config += 1
             
+
             encoder.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, resolution=res, config=config,
                             docker_client=docker_client, report_name = report_name)
             FFE.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, width=width, height=height, report_name=report_name)
 
+            config += 1
+            
             start = time.time()
             minimize_results = gp_minimize(func=encoder.objective,
                                            dimensions=encoder.SPACE,
