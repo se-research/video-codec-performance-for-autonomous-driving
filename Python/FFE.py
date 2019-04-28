@@ -33,7 +33,7 @@ def get_commands():
                 '--delay=0',
                 '--delay.start=150',
                 '--stopafter=' + str(utilities.STOP_AFTER),
-                # '--noexitontimeout'
+                '--noexitontimeout'
                 # '--verbose',
                 ]
     else:

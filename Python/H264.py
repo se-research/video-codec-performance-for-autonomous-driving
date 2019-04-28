@@ -84,7 +84,7 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
             prefix_nal, entropy_coding, frame_skip, qp_max, qp_min, long_term_ref, loop_filter, denoise,
             background_detection, adaptive_quant, frame_cropping, scene_change_detect, padding):
 
-    utilities.TIMED_OUT = 0  # resets violation variable
+    utilities.TIMED_OUT = False  # resets violation variable
 
     try:  # try/catch to catch when the containers crash due to illegal parameter combination
         def get_list_encoder():
@@ -168,6 +168,9 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
         sum += float(row[10])  # accomulate values in SSIM column
         length += 1
 
+    if length == 0:
+        return 1
+        
     avg = sum / length  # computes SSIM average
 
     if avg > utilities.max_ssim:  # if the new mean ssim is the best so far, update max_ssim and best_config variables

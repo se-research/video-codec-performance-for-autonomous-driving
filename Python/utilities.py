@@ -7,7 +7,7 @@ SHARED_MEMORY_AREA = 'video1'
 
 STOP_AFTER = 80
 TIMED_OUT_MSG_BYTES = str.encode('[frame-feed-evaluator]: Timed out while waiting for encoded frame.\n')
-TIMED_OUT = 0
+TIMED_OUT = False
 
 PNGS_PATH = os.path.join(os.getcwd(), '../2019-03-22_AstaZero_RuralRoad')
 OUTPUT_REPORT_PATH = os.path.join(os.getcwd(), 'reports')
@@ -30,7 +30,7 @@ def log_helper(log_generator, color):
         print('\033[' + color + 'm### \033[0m' + (str(x, 'utf-8')))  # Prints with color code prefix and in utf-8
         if x == TIMED_OUT_MSG_BYTES:
             # global TIMED_OUT
-            TIMED_OUT = 1
+            TIMED_OUT = True
 
 
 # Saves list in output_name as name, creates dir output_path if not already exists
