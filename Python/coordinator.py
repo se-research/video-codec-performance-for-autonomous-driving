@@ -137,7 +137,8 @@ def build(docker_client, encoder):
             print('Found ' + encoder['TAG'] + ' image locally')
         except docker.errors.ImageNotFound:
             print(
-                'Building ' + encoder['TAG'] + ' from ' + encoder['REPO'] + '#' + encoder['VERSION'] + '. It may take some time...')
+                'Building ' + encoder['TAG'] + ' from ' + encoder['REPO'] + '#' + encoder[
+                    'VERSION'] + '. It may take some time...')
             image = docker_client.images.build(path=encoder['REPO'] + '#' + encoder['VERSION'],
                                                dockerfile='Dockerfile.amd64',
                                                tag=encoder['TAG'],
@@ -162,15 +163,16 @@ def build(docker_client, encoder):
 
 def minimize_callback(result):
     global config
-    if(config < N_CALLS):
+    if (config < N_CALLS):
         config += 1
     else:
         config = 0
 
+
 if __name__ == '__main__':
     docker_client = docker.from_env()
 
-    encoders = [H264] #x264, VPX]
+    encoders = [H264]  # x264, VPX]
 
     for encoder in encoders:
         build(docker_client, {'TAG': encoder.TAG, 'REPO': encoder.REPO, 'VERSION': encoder.VERSION})
@@ -182,11 +184,13 @@ if __name__ == '__main__':
             height = res[2]
             resolution = RESOLUTIONS[0]
 
-            report_name = utilities.generate_report_name(tag = encoder.TAG, resolution_name = resolution_name, config = config)
-            
+            report_name = utilities.generate_report_name(tag=encoder.TAG, resolution_name=resolution_name,
+                                                         config=config)
+
             encoder.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, resolution=res,
-                            docker_client=docker_client, report_name = report_name)
-            FFE.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, width=width, height=height, report_name=report_name)
+                               docker_client=docker_client, report_name=report_name)
+            FFE.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, width=width, height=height,
+                           report_name=report_name)
 
             start = time.time()
             default_config = encoder.get_default_encoder_config()
@@ -198,7 +202,7 @@ if __name__ == '__main__':
                                            n_random_starts=10,
                                            acq_func="gp_hedge",
                                            acq_optimizer="auto",
-                                           x0=None,
+                                           x0=H264.get_default_encoder_config(),
                                            y0=None,
                                            random_state=None,
                                            verbose=True,
@@ -228,7 +232,6 @@ if __name__ == '__main__':
             ax = plot_convergence(minimize_results)
             ax.set_ylim(top=1, bottom=0)
             ax.set_title('AstaZero_Rural_Road-' + encoder.TAG + '-' + res[0])
-
 
             OUTPUT_CONVERGENCE_PATH = os.path.join(os.getcwd(), 'convergence')
             if os.path.isdir(OUTPUT_CONVERGENCE_PATH):

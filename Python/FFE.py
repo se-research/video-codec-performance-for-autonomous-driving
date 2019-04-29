@@ -7,11 +7,12 @@ VERSION = 'v0.0.4'
 TAG = 'ffe:' + VERSION
 
 VOLUMES = {'/tmp/': {'bind': '/tmp', 'mode': 'rw'},
-            utilities.OUTPUT_REPORT_PATH: {'bind': '/host', 'mode': 'rw'},
-            utilities.PNGS_PATH: {
-                'bind': '/pngs',
-                'mode': 'rw'}
-            }
+           utilities.OUTPUT_REPORT_PATH: {'bind': '/host', 'mode': 'rw'},
+           utilities.PNGS_PATH: {
+               'bind': '/pngs',
+               'mode': 'rw'}
+           }
+
 
 def initialize(init_width='0', init_height='0', width='0', height='0', report_name='not_set'):
     _local_variables['init_width'] = init_width
@@ -20,8 +21,9 @@ def initialize(init_width='0', init_height='0', width='0', height='0', report_na
     _local_variables['height'] = height
     _local_variables['report_name'] = report_name
 
+
 def get_commands():
-    if(_local_variables):
+    if _local_variables:
         return ['--folder=/pngs',
                 '--report=' + _local_variables['report_name'],
                 '--cid=' + utilities.CID,
@@ -37,4 +39,4 @@ def get_commands():
                 # '--verbose',
                 ]
     else:
-        raise Exeption('FFE was never initialized. Run the initialize method.')
+        raise Exception('FFE was never initialized. Run the initialize method.')
