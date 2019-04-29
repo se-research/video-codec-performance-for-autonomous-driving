@@ -8,13 +8,12 @@ import coordinator
     
 _local_variables = {}
 
-def initialize(init_width='0', init_height='0', resolution=['VGA', '640', '480'], config=0, docker_client=None, report_name = 'not_set_in_encoder'):
+def initialize(init_width='0', init_height='0', resolution=['VGA', '640', '480'], docker_client=None, report_name = 'not_set_in_encoder'):
     _local_variables['init_width'] = init_width
     _local_variables['init_height'] = init_height
     _local_variables['resolution_name'] = resolution[0]
     _local_variables['width'] = resolution[1]
     _local_variables['height'] = resolution[2]
-    _local_variables['config'] = config
     _local_variables['docker_client'] = docker_client
     _local_variables['report_name'] = report_name
 
@@ -169,13 +168,17 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
         length += 1
 
     if length == 0:
+        print('--------- EMPTY FILE ---------')
         return 1
         
     avg = sum / length  # computes SSIM average
-
+    print('max_0: ' + str(utilities.max_ssim))
     if avg > utilities.max_ssim:  # if the new mean ssim is the best so far, update max_ssim and best_config variables
+        print('max_1: ' + str(utilities.max_ssim))
         utilities.max_ssim = avg
-        global best_config
-        best_config = _local_variables['report_name']
+        print('max_2: ' + str(utilities.max_ssim))
+
+        #global best_config
+        coordinator.best_config = _local_variables['report_name']
 
     return 1 - avg  # subtracts mean SSIM from 1 since the algorithm tries to find the minimum

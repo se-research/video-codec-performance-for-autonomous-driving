@@ -33,6 +33,8 @@ width = '640'
 height = '480'
 resolution = 'not_set'
 
+N_CALLS = 100
+
 best_config = 'not_set'
 config = 0
 
@@ -160,7 +162,10 @@ def build(docker_client, encoder):
 
 def minimize_callback(result):
     global config
-    config += 1
+    if(config < N_CALLS):
+        config += 1
+    else:
+        config = 0
 
 if __name__ == '__main__':
     docker_client = docker.from_env()
@@ -179,7 +184,7 @@ if __name__ == '__main__':
 
             report_name = utilities.generate_report_name(tag = encoder.TAG, resolution_name = resolution_name, config = config)
             
-            encoder.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, resolution=res, config=config,
+            encoder.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, resolution=res,
                             docker_client=docker_client, report_name = report_name)
             FFE.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, width=width, height=height, report_name=report_name)
 
@@ -189,7 +194,7 @@ if __name__ == '__main__':
             minimize_results = gp_minimize(func=encoder.objective,
                                            dimensions=encoder.SPACE,
                                            base_estimator=None,
-                                           n_calls=10,
+                                           n_calls=N_CALLS,
                                            n_random_starts=10,
                                            acq_func="gp_hedge",
                                            acq_optimizer="auto",

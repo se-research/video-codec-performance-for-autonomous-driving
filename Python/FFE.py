@@ -31,7 +31,7 @@ def get_commands():
                 '--crop.width=' + _local_variables['width'],
                 '--crop.height=' + _local_variables['height'],
                 '--delay=0',
-                '--delay.start=150',
+                '--delay.start=200',
                 '--stopafter=' + str(utilities.STOP_AFTER),
                 # '--noexitontimeout'
                 # '--verbose',
