@@ -147,6 +147,6 @@ if __name__ == '__main__':
 
             utilities.save_list(best_parameters, utilities.OUTPUT_BEST_CONFIG_REPORT_PATH, utilities.get_best_config_name())
 
-            best_config_report_paths.append('best_config_reports/' + utilities.get_best_config_name())
+            best_config_report_paths.append('best_config_report/' + utilities.get_best_config_name())
 
         plot_generator.run(best_config_report_paths, utilities.OUTPUT_GRAPH_PATH)

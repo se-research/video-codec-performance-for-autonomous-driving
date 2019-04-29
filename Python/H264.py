@@ -1,9 +1,11 @@
 from skopt.space import Integer, Categorical
 from skopt.utils import use_named_args
+from statistics import mean
 import threading
 import csv
 import utilities
 import FFE
+
 
 _local_variables = {}
 
@@ -166,23 +168,35 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
 
     if utilities.get_time_out():  # FFE timed out due to size or compression time constraint violated
         print('--------- TIMED OUT ---------')
-        return 1  # returns 1 (inverted due to minimization algorithm)
+        return 2.5  # returns 2.5 (inverted due to minimization algorithm)
 
     file = open(utilities.OUTPUT_REPORT_PATH + '/' + _local_variables['report_name'], 'r')  # opens report generated
     plots = csv.reader(file, delimiter=';')
-    sum = 0
+
+    ssim_sum = 0
     length = 0
+    time_violations=[]
+
     for row in plots:
-        sum += float(row[10])  # accomulate values in SSIM column
+        ssim_sum += float(row[10])  # accomulate values in SSIM column
         length += 1
+
+        time = float(row[12])
+        print("Print time: " + str(time))
+        if time > 40000: # scales violation time up to 250 % (2.5) violation
+            time_violations.append(time)
+
+    if time_violations:
+        print("Returns this value: " + str(mean(time_violations) / 40000))
+        return mean(time_violations) / 40000
 
     if length == 0:
         print('--------- EMPTY FILE ---------')
-        return 1
+        return 2.5
 
-    avg = sum / length  # computes SSIM average
-    if avg > utilities.get_max_ssim():  # if the new avg ssim is the best so far, update max_ssim & best_config_name variable
-        utilities.set_max_ssim(avg)
+    ssim_avg = ssim_sum / length  # computes SSIM average
+    if ssim_avg > utilities.get_max_ssim():  # if the new avg ssim is the best so far, update max_ssim & best_config_name variable
+        utilities.set_max_ssim(ssim_avg)
         utilities.set_best_config_name(_local_variables['report_name'])
 
-    return 1 - avg  # subtracts mean SSIM from 1 since the algorithm tries to find the minimum
+    return 1 - ssim_avg  # subtracts mean SSIM from 1 since the algorithm tries to find the minimum

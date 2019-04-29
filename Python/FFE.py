@@ -39,7 +39,7 @@ def get_commands():
                 '--delay=0',
                 '--delay.start=200',
                 '--stopafter=' + str(utilities.STOP_AFTER),
-                '--timeout=25'
+                '--timeout=100'
                 # '--noexitontimeout'
                 # '--verbose',
                 ]
