@@ -14,6 +14,10 @@ VOLUMES = {'/tmp/': {'bind': '/tmp', 'mode': 'rw'},
            }
 
 
+def set_report_name(name):
+    _local_variables['report_name'] = name
+
+
 def initialize(init_width='0', init_height='0', width='0', height='0', report_name='not_set'):
     _local_variables['init_width'] = init_width
     _local_variables['init_height'] = init_height
@@ -35,6 +39,7 @@ def get_commands():
                 '--delay=0',
                 '--delay.start=200',
                 '--stopafter=' + str(utilities.STOP_AFTER),
+                '--timeout=25'
                 # '--noexitontimeout'
                 # '--verbose',
                 ]

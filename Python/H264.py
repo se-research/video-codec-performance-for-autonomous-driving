@@ -4,11 +4,16 @@ import threading
 import csv
 import utilities
 import FFE
-import coordinator
-    
+
 _local_variables = {}
 
-def initialize(init_width='0', init_height='0', resolution=['VGA', '640', '480'], docker_client=None, report_name = 'not_set_in_encoder'):
+
+def set_report_name(name):
+    _local_variables['report_name'] = name
+
+
+def initialize(init_width='0', init_height='0', resolution=['VGA', '640', '480'], docker_client=None,
+               report_name='not_set_in_encoder'):
     _local_variables['init_width'] = init_width
     _local_variables['init_height'] = init_height
     _local_variables['resolution_name'] = resolution[0]
@@ -16,6 +21,7 @@ def initialize(init_width='0', init_height='0', resolution=['VGA', '640', '480']
     _local_variables['height'] = resolution[2]
     _local_variables['docker_client'] = docker_client
     _local_variables['report_name'] = report_name
+
 
 REPO = 'https://github.com/chalmers-revere/opendlv-video-h264-encoder.git'
 VERSION = 'v0.0.2'
@@ -32,58 +38,60 @@ PARAMETERS = (
 # https://slhck.info/video/2017/02/24/crf-guide.html
 # All parameters available in h264 and their ranges
 SPACE = [Integer(100000, 5000000, name='bitrate'),
-        Integer(100000, 5000000, name='bitrate_max'),
-        Integer(1, 250, name='gop'),
-        Integer(-1, 3, name='rc_mode'),
-        Integer(0, 2, name='ecomplexity'),
-        Categorical((0, 1, 2, 3, 6), name='sps_pps_strategy'),
-        Integer(1, 16, name='num_ref_frame'),
-        Integer(0, 1, name='ssei'),
-        Integer(0, 1, name='prefix_nal'),
-        Integer(0, 1, name='entropy_coding'),
-        Integer(0, 1, name='frame_skip'),
-        Integer(0, 51, name='qp_max'),  # fix
-        Integer(0, 50, name='qp_min'),  # fix
-        Integer(0, 1, name='long_term_ref'),
-        Integer(0, 2, name='loop_filter'),
-        Integer(0, 1, name='denoise'),
-        Integer(0, 1, name='background_detection'),
-        Integer(0, 1, name='adaptive_quant'),
-        Integer(0, 1, name='frame_cropping'),
-        Integer(0, 1, name='scene_change_detect'),
-        Integer(0, 1, name='padding')
-        ]
+         Integer(100000, 5000000, name='bitrate_max'),
+         Integer(1, 250, name='gop'),
+         Integer(-1, 3, name='rc_mode'),
+         Integer(0, 2, name='ecomplexity'),
+         Categorical((0, 1, 2, 3, 6), name='sps_pps_strategy'),
+         Integer(1, 16, name='num_ref_frame'),
+         Integer(0, 1, name='ssei'),
+         Integer(0, 1, name='prefix_nal'),
+         Integer(0, 1, name='entropy_coding'),
+         Integer(0, 1, name='frame_skip'),
+         Integer(0, 51, name='qp_max'),  # fix
+         Integer(0, 50, name='qp_min'),  # fix
+         Integer(0, 1, name='long_term_ref'),
+         Integer(0, 2, name='loop_filter'),
+         Integer(0, 1, name='denoise'),
+         Integer(0, 1, name='background_detection'),
+         Integer(0, 1, name='adaptive_quant'),
+         Integer(0, 1, name='frame_cropping'),
+         Integer(0, 1, name='scene_change_detect'),
+         Integer(0, 1, name='padding')
+         ]
+
 
 def get_default_encoder_config():
-    return [1500000, # bitrate
-            5000000, # max_bitrate
-            10,      # qop
-            0,       # rc_mode
-            0,       # ecomplexity
-            0,       # sps_pps_strategy
-            1,       # num_ref_frame
-            0,       # ssei
-            0,       # prefix_nal
-            0,       # entropy_coding
-            1,       # frame_skip
-            42,      # qp_max
-            12,      # qp_min
-            0,       # long_term_ref
-            0,       # loop_filter
-            0,       # denoise
-            1,       # background_detection
-            1,       # adaptive_quant
-            1,       # frame_cropping
-            1,       # scene_change_detect
-            1,       # padding
+    return [1500000,  # bitrate
+            5000000,  # max_bitrate
+            10,  # qop
+            0,  # rc_mode
+            0,  # ecomplexity
+            0,  # sps_pps_strategy
+            1,  # num_ref_frame
+            0,  # ssei
+            0,  # prefix_nal
+            0,  # entropy_coding
+            1,  # frame_skip
+            42,  # qp_max
+            12,  # qp_min
+            0,  # long_term_ref
+            0,  # loop_filter
+            0,  # denoise
+            1,  # background_detection
+            1,  # adaptive_quant
+            1,  # frame_cropping
+            1,  # scene_change_detect
+            1,  # padding
             ]
+
 
 @use_named_args(SPACE)
 def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy, num_ref_frame, ssei,
-            prefix_nal, entropy_coding, frame_skip, qp_max, qp_min, long_term_ref, loop_filter, denoise,
-            background_detection, adaptive_quant, frame_cropping, scene_change_detect, padding):
+              prefix_nal, entropy_coding, frame_skip, qp_max, qp_min, long_term_ref, loop_filter, denoise,
+              background_detection, adaptive_quant, frame_cropping, scene_change_detect, padding):
 
-    utilities.TIMED_OUT = False  # resets violation variable
+    utilities.reset_time_out()  # resets violation variable
 
     try:  # try/catch to catch when the containers crash due to illegal parameter combination
         def get_list_encoder():
@@ -116,28 +124,29 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
                     ]
 
         container_ffe = _local_variables['docker_client'].containers.run(FFE.TAG,
-                                                        command=FFE.get_commands(),
-                                                        volumes=FFE.VOLUMES,
-                                                        environment=['DISPLAY=:0'],
-                                                        working_dir='/host',
-                                                        network_mode="host",
-                                                        ipc_mode="host",
-                                                        remove=True,
-                                                        detach=True,
-                                                        )
+                                                                         command=FFE.get_commands(),
+                                                                         volumes=FFE.VOLUMES,
+                                                                         environment=['DISPLAY=:0'],
+                                                                         working_dir='/host',
+                                                                         network_mode="host",
+                                                                         ipc_mode="host",
+                                                                         remove=True,
+                                                                         detach=True,
+                                                                         )
 
         container_encoder = _local_variables['docker_client'].containers.run(TAG,
-                                                            command=get_list_encoder(),
-                                                            volumes={'/tmp': {'bind': '/tmp', 'mode': 'rw'}},
-                                                            network_mode="host",
-                                                            ipc_mode="host",
-                                                            remove=True,
-                                                            detach=True
-                                                            )
+                                                                             command=get_list_encoder(),
+                                                                             volumes={'/tmp': {'bind': '/tmp',
+                                                                                               'mode': 'rw'}},
+                                                                             network_mode="host",
+                                                                             ipc_mode="host",
+                                                                             remove=True,
+                                                                             detach=True
+                                                                             )
         thread_logs_ffe = threading.Thread(target=utilities.log_helper,
-                                        args=[container_ffe.logs(stream=True), utilities.PREFIX_COLOR_FFE])
+                                           args=[container_ffe.logs(stream=True), utilities.PREFIX_COLOR_FFE])
         thread_logs_encoder = threading.Thread(target=utilities.log_helper, args=[container_encoder.logs(stream=True),
-                                                                        utilities.PREFIX_COLOR_ENCODER])
+                                                                                  utilities.PREFIX_COLOR_ENCODER])
         thread_logs_ffe.start()
         thread_logs_encoder.start()
 
@@ -155,8 +164,8 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
             print(e)
             return 1  # returns 1 as SSIM in case of crash (inverted due to minimization algorithm)
 
-    if utilities.TIMED_OUT:  # FFE timed out due to size or compression time constraint violated
-        print("TIMED OUT")
+    if utilities.get_time_out():  # FFE timed out due to size or compression time constraint violated
+        print('--------- TIMED OUT ---------')
         return 1  # returns 1 (inverted due to minimization algorithm)
 
     file = open(utilities.OUTPUT_REPORT_PATH + '/' + _local_variables['report_name'], 'r')  # opens report generated
@@ -170,15 +179,10 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
     if length == 0:
         print('--------- EMPTY FILE ---------')
         return 1
-        
-    avg = sum / length  # computes SSIM average
-    print('max_0: ' + str(utilities.max_ssim))
-    if avg > utilities.max_ssim:  # if the new mean ssim is the best so far, update max_ssim and best_config variables
-        print('max_1: ' + str(utilities.max_ssim))
-        utilities.max_ssim = avg
-        print('max_2: ' + str(utilities.max_ssim))
 
-        #global best_config
-        coordinator.best_config = _local_variables['report_name']
+    avg = sum / length  # computes SSIM average
+    if avg > utilities.get_max_ssim():  # if the new avg ssim is the best so far, update max_ssim & best_config_name variable
+        utilities.set_max_ssim(avg)
+        utilities.set_best_config_name(_local_variables['report_name'])
 
     return 1 - avg  # subtracts mean SSIM from 1 since the algorithm tries to find the minimum
