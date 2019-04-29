@@ -8,11 +8,11 @@ STOP_AFTER = 80
 TIMED_OUT_MSG_BYTES = str.encode('[frame-feed-evaluator]: Timed out while waiting for encoded frame.\n')
 TIMED_OUT = False
 
-PNGS_PATH = os.path.join(os.getcwd(), '../2019-03-22_AstaZero_RuralRoad')
+PNGS_PATH = os.path.join(os.getcwd(), '../2019-04-28_AstaZero-RuralRoad')
 OUTPUT_REPORT_PATH = os.path.join(os.getcwd(), 'reports')
 OUTPUT_CONVERGENCE_PATH = os.path.join(os.getcwd(), 'convergence')
 OUTPUT_GRAPH_PATH = os.path.join(os.getcwd(), 'graphs')
-OUTPUT_BEST_CONFIG_REPORT_PATH = os.path.join(os.getcwd(), 'best_configs_report')
+OUTPUT_BEST_CONFIG_REPORT_PATH = os.path.join(os.getcwd(), 'best_config_report')
 
 PREFIX_COLOR_FFE = '92'
 PREFIX_COLOR_ENCODER = '94'
@@ -21,39 +21,10 @@ max_ssim = 0
 best_config_name = 'not_set'
 time_out = False
 
-
-def set_time_out():
-    global time_out
-    time_out = True
+MAX_VIOLATION = 2.5
 
 
-def reset_time_out():
-    global time_out
-    time_out = False
-
-
-def get_time_out():
-    return time_out
-
-
-def set_max_ssim(ssim):
-    global max_ssim
-    max_ssim = ssim
-
-
-def get_max_ssim():
-    return max_ssim
-
-
-def set_best_config_name(name):
-    global best_config_name
-    best_config_name = name
-
-
-def get_best_config_name():
-    return best_config_name
-
-    # returns the report_name in correct format
+# Returns the report_name in correct format
 def generate_report_name(tag, resolution_name, config):
     report_name = 'ffe-AstaZero_Rural_Road-' + tag + '-' + resolution_name + '-' + 'C' + str(
         config) + '.csv'
@@ -113,3 +84,35 @@ def calculate_crop_x(initial_width, width):
 
 def calculate_crop_y(initial_height, height):
     return str(int(initial_height) - (int(height)))
+
+
+def set_time_out():
+    global time_out
+    time_out = True
+
+
+def reset_time_out():
+    global time_out
+    time_out = False
+
+
+def get_time_out():
+    return time_out
+
+
+def set_max_ssim(ssim):
+    global max_ssim
+    max_ssim = ssim
+
+
+def get_max_ssim():
+    return max_ssim
+
+
+def set_best_config_name(name):
+    global best_config_name
+    best_config_name = name
+
+
+def get_best_config_name():
+    return best_config_name

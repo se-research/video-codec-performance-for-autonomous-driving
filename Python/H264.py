@@ -122,7 +122,7 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
                     '--frame-cropping' + str(frame_cropping),
                     '--scene-change-detect=' + str(scene_change_detect),
                     '--padding=' + str(padding),
-                    # '--verbose'
+                    #'--verbose'
                     ]
 
         container_ffe = _local_variables['docker_client'].containers.run(FFE.TAG,
@@ -153,7 +153,7 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
         thread_logs_encoder.start()
 
         thread_logs_ffe.join()  # Blocks execution until both threads has terminated
-        thread_logs_encoder.join()  # @TODO  Change to have the actual containers, encoder and ffe, blocking
+        thread_logs_encoder.join()
 
     except Exception as e:
         print(e)
@@ -161,42 +161,37 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
         try:
             container_ffe.kill()  # ensures that both containers are killed to not get conflicts for new containers
             container_encoder.kill()
-            return 1  # returns 1 as SSIM in case of crash (inverted due to minimization algorithm)
+            return utilities.MAX_VIOLATION  # returns MAX_VIOLATION as SSIM in case of crash
         except Exception as e:
             print(e)
-            return 1  # returns 1 as SSIM in case of crash (inverted due to minimization algorithm)
+            return utilities.MAX_VIOLATION
 
-    if utilities.get_time_out():  # FFE timed out due to size or compression time constraint violated
+    if utilities.get_time_out():  # FFE timed out due to compression time constraint violated
         print('--------- TIMED OUT ---------')
-        return 2.5  # returns 2.5 (inverted due to minimization algorithm)
+        return utilities.MAX_VIOLATION
 
     file = open(utilities.OUTPUT_REPORT_PATH + '/' + _local_variables['report_name'], 'r')  # opens report generated
     plots = csv.reader(file, delimiter=';')
 
-    ssim_sum = 0
-    length = 0
     time_violations=[]
-
+    ssim =[]
     for row in plots:
-        ssim_sum += float(row[10])  # accomulate values in SSIM column
-        length += 1
+        ssim.append(float(row[10]))  # accomulate values in SSIM column
 
         time = float(row[12])
-        print("Print time: " + str(time))
-        if time > 40000: # scales violation time up to 250 % (2.5) violation
+        if time > 40000:  # scales violation time up to 250 % (2.5) violation
             time_violations.append(time)
 
-    if time_violations:
-        print("Returns this value: " + str(mean(time_violations) / 40000))
+    if time_violations:  # if the list is not empty
         return mean(time_violations) / 40000
 
-    if length == 0:
+    if not ssim:  # if the list is empty
         print('--------- EMPTY FILE ---------')
-        return 2.5
+        return utilities.MAX_VIOLATION
 
-    ssim_avg = ssim_sum / length  # computes SSIM average
-    if ssim_avg > utilities.get_max_ssim():  # if the new avg ssim is the best so far, update max_ssim & best_config_name variable
-        utilities.set_max_ssim(ssim_avg)
+    ssim_mean = mean(ssim)  # computes SSIM average
+    if ssim_mean > utilities.get_max_ssim():  # update max_ssim & best_config_name variable
+        utilities.set_max_ssim(ssim_mean)
         utilities.set_best_config_name(_local_variables['report_name'])
 
-    return 1 - ssim_avg  # subtracts mean SSIM from 1 since the algorithm tries to find the minimum
+    return 1 - ssim_mean  # subtracts mean SSIM from 1 since the algorithm tries to find the minimum

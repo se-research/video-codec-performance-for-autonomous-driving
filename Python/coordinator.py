@@ -12,7 +12,7 @@ import FFE
 width = '640'
 height = '480'
 
-N_CALLS = 11
+N_CALLS = 50
 
 config = 0
 
@@ -90,14 +90,14 @@ if __name__ == '__main__':
     encoders = [H264]  # x264, VPX]
 
     for encoder in encoders:
-        build()
+        build() # build FFE and encoder in case they cannot be found locally
 
         best_config_report_paths = []
         for (_, res) in enumerate(RESOLUTIONS):
             resolution_name = res[0]
             width = res[1]
             height = res[2]
-            utilities.set_max_ssim(0)
+            utilities.set_max_ssim(0)   # reset max_ssim and best_config_name for each resolution
             utilities.set_best_config_name('not_set')
 
             encoder.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, resolution=res,
@@ -139,7 +139,7 @@ if __name__ == '__main__':
                 best_parameters.append(encoder.PARAMETERS[i] + ': ' + str(value) + '\n')
                 print(encoder.PARAMETERS[i] + ': ' + str(value))  # prints parameters that obtained the highest SSIM
                 i += 1
-            print("Best config: " + utilities.best_config_name)
+            print("Best config: " + utilities.get_best_config_name())
             print("It took: ", str((now - start) / 60), " minutes")
 
             ax = plot_convergence(minimize_result)
