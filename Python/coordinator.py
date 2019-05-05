@@ -7,12 +7,13 @@ from skopt.plots import plot_convergence
 import plot_generator
 import utilities
 import H264
+import VPX
 import FFE
 
 width = '640'
 height = '480'
 
-N_CALLS = 50
+N_CALLS = 21
 
 config = 0
 
@@ -87,7 +88,7 @@ def update_report_name_callback(_):
 if __name__ == '__main__':
     docker_client = docker.from_env()
 
-    encoders = [H264]  # x264, VPX]
+    encoders = [H264]  # x264, VPX, H264]
 
     for encoder in encoders:
         build() # build FFE and encoder in case they cannot be found locally
@@ -115,7 +116,7 @@ if __name__ == '__main__':
                                           n_random_starts=10,
                                           acq_func="gp_hedge",
                                           acq_optimizer="auto",
-                                          x0=encoder.get_default_encoder_config(),
+                                          x0=encoder.get_default_encoder_config(), # None
                                           y0=None,
                                           random_state=None,
                                           verbose=True,

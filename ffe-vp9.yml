@@ -32,7 +32,7 @@ services:
         command: "--folder=/pngs --report=ffe-vp9.csv --cid=111 --name=video0 --crop.x=376 --crop.y=32 --crop.width=640 --crop.height=480 --delay=0 --timeout=1000"
 
     video-vp8-encoder-amd64:
-        container_name: vp8
+        container_name: vp9
         depends_on:
         - frame-feed-evaluator
         build:
