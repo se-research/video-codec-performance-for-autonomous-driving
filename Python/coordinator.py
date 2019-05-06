@@ -44,15 +44,15 @@ def build():
 
     def build_encoder():
         try:
-            docker_client.images.get(encoder['TAG'])
-            print('Found ' + encoder['TAG'] + ' image locally')
+            docker_client.images.get(encoder.TAG)
+            print('Found ' + encoder.TAG + ' image locally')
         except docker.errors.ImageNotFound:
             print(
-                'Building ' + encoder['TAG'] + ' from ' + encoder['REPO'] + '#' + encoder[
-                    'VERSION'] + '. It may take some time...')
-            image = docker_client.images.build(path=encoder['REPO'] + '#' + encoder['VERSION'],
+                'Building ' + encoder.TAG + ' from ' + encoder.REPO + '#' + encoder.VERSION +
+                '. It may take some time...')
+            image = docker_client.images.build(path=encoder.REPO + '#' + encoder.VERSION,
                                                dockerfile='Dockerfile.amd64',
-                                               tag=encoder['TAG'],
+                                               tag=encoder.TAG,
                                                rm=True,
                                                forcerm=True
                                                )
@@ -90,14 +90,14 @@ if __name__ == '__main__':
     encoders = [H264]  # x264, VPX]
 
     for encoder in encoders:
-        build() # build FFE and encoder in case they cannot be found locally
+        build()  # build FFE and encoder in case they cannot be found locally
 
         best_config_report_paths = []
         for (_, res) in enumerate(RESOLUTIONS):
             resolution_name = res[0]
             width = res[1]
             height = res[2]
-            utilities.set_max_ssim(0)   # reset max_ssim and best_config_name for each resolution
+            utilities.set_max_ssim(0)  # reset max_ssim and best_config_name for each resolution
             utilities.set_best_config_name('not_set')
 
             encoder.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, resolution=res,
@@ -145,7 +145,8 @@ if __name__ == '__main__':
             ax = plot_convergence(minimize_result)
             utilities.save_convergence(axes=ax, encoder=encoder, resolution_name=resolution_name)
 
-            utilities.save_list(best_parameters, utilities.OUTPUT_BEST_CONFIG_REPORT_PATH, utilities.get_best_config_name())
+            utilities.save_list(best_parameters, utilities.OUTPUT_BEST_CONFIG_REPORT_PATH,
+                                utilities.get_best_config_name())
 
             best_config_report_paths.append('reports/' + utilities.get_best_config_name())
 
