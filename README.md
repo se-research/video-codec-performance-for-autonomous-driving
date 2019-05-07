@@ -2,8 +2,9 @@
 
 ## Run in Python virtual environment (venv)
 #### Set up virtual environment with dependencies (only has to setup once)
-1. `chmod +x install_deps.sh` Makes shell script executable
-2. `./install_deps.sh` Runs shell script that installs all depenecies and creates venv 
+1. cd into `video-codec-performance-for-autonomous-driving/Python`
+2. `chmod +x install_deps.sh` Makes shell script executable
+3. `./install_deps.sh` Runs shell script that installs all depenecies and creates venv 
 
 #### Run the script
 1. `source ~/py3-environments/coordinator/bin/activate` Activates venv
