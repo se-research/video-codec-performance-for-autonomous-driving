@@ -19,8 +19,8 @@ config = 0
 INITIAL_WIDTH = '2048'
 INITIAL_HEIGHT = '1536'
 
-RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['HD720', '1280', '720'],
-               ['HD1080', '1920', '1080'], ['QXGA', '2048', '1536']]
+RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['WXGA', '1280', '720'],
+               ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']]
 
 
 def build():
@@ -89,65 +89,75 @@ if __name__ == '__main__':
 
     encoders = [H264]  # x264, VPX]
 
-    for encoder in encoders:
-        build()  # build FFE and encoder in case they cannot be found locally
+    datasets = utilities.get_datasets()
+    if not datasets:
+        print("No folders found in " + utilities.DATASETS_PATH)
+        sys.exit("Exiting..")
+    else:
+        print("Following datasets are to be evaluated: " + str(datasets))
 
-        best_config_report_paths = []
-        for (_, res) in enumerate(RESOLUTIONS):
-            resolution_name = res[0]
-            width = res[1]
-            height = res[2]
-            utilities.set_max_ssim(0)  # reset max_ssim and best_config_name for each resolution
-            utilities.set_best_config_name('not_set')
+    for dataset in datasets:
+        utilities.set_dataset(dataset)
 
-            encoder.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, resolution=res,
-                               docker_client=docker_client)
-            FFE.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, width=width, height=height)
+        for encoder in encoders:
+            build()  # build FFE and encoder in case they cannot be found locally
 
-            update_report_name_callback(_)
+            best_config_report_paths = []
+            for (_, res) in enumerate(RESOLUTIONS):
+                resolution_name = res[0]
+                width = res[1]
+                height = res[2]
+                utilities.set_max_ssim(0)  # reset max_ssim and best_config_name for each resolution
+                utilities.set_best_config_name('not_set')
 
-            start = time.time()
+                encoder.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, resolution=res,
+                                   docker_client=docker_client)
+                FFE.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, width=width, height=height)
 
-            minimize_result = gp_minimize(func=encoder.objective,
-                                          dimensions=encoder.SPACE,
-                                          base_estimator=None,
-                                          n_calls=N_CALLS,
-                                          n_random_starts=10,
-                                          acq_func="gp_hedge",
-                                          acq_optimizer="auto",
-                                          x0=encoder.get_default_encoder_config(),
-                                          y0=None,
-                                          random_state=None,
-                                          verbose=True,
-                                          callback=update_report_name_callback,
-                                          n_points=10000,
-                                          n_restarts_optimizer=5,
-                                          xi=0.01,
-                                          kappa=1.96,
-                                          noise="gaussian",
-                                          n_jobs=1,
-                                          )
+                update_report_name_callback(_)
 
-            now = time.time()
+                start = time.time()
 
-            print("Best score=%.4f" % minimize_result.fun)
-            print("Best parameters:")
+                minimize_result = gp_minimize(func=encoder.objective,
+                                              dimensions=encoder.SPACE,
+                                              base_estimator=None,
+                                              n_calls=N_CALLS,
+                                              n_random_starts=10,
+                                              acq_func="gp_hedge",
+                                              acq_optimizer="auto",
+                                              x0=encoder.get_default_encoder_config(),
+                                              y0=None,
+                                              random_state=None,
+                                              verbose=True,
+                                              callback=update_report_name_callback,
+                                              n_points=10000,
+                                              n_restarts_optimizer=5,
+                                              xi=0.01,
+                                              kappa=1.96,
+                                              noise="gaussian",
+                                              n_jobs=1,
+                                              )
 
-            best_parameters = []
-            i = 0
-            for value in minimize_result.x:
-                best_parameters.append(encoder.PARAMETERS[i] + ': ' + str(value) + '\n')
-                print(encoder.PARAMETERS[i] + ': ' + str(value))  # prints parameters that obtained the highest SSIM
-                i += 1
-            print("Best config: " + utilities.get_best_config_name())
-            print("It took: ", str((now - start) / 60), " minutes")
+                now = time.time()
 
-            ax = plot_convergence(minimize_result)
-            utilities.save_convergence(axes=ax, encoder=encoder, resolution_name=resolution_name)
+                print("Best score=%.4f" % minimize_result.fun)
+                print("Best parameters:")
 
-            utilities.save_list(best_parameters, utilities.OUTPUT_BEST_CONFIG_REPORT_PATH,
-                                utilities.get_best_config_name())
+                best_parameters = []
+                i = 0
+                for value in minimize_result.x:
+                    best_parameters.append(encoder.PARAMETERS[i] + ': ' + str(value) + '\n')
+                    print(encoder.PARAMETERS[i] + ': ' + str(value))  # prints parameters that obtained the highest SSIM
+                    i += 1
+                print("Best config: " + utilities.get_best_config_name())
+                print("It took: ", str((now - start) / 60), " minutes")
 
-            best_config_report_paths.append('reports/' + utilities.get_best_config_name())
+                ax = plot_convergence(minimize_result)
+                utilities.save_convergence(axes=ax, encoder=encoder, resolution_name=resolution_name)
 
-        plot_generator.run(best_config_report_paths, utilities.OUTPUT_GRAPH_PATH)
+                utilities.save_list(best_parameters, utilities.OUTPUT_BEST_CONFIG_REPORT_PATH,
+                                    utilities.get_best_config_name())
+
+                best_config_report_paths.append('reports/' + utilities.get_best_config_name())
+
+            plot_generator.run(best_config_report_paths, utilities.OUTPUT_GRAPH_PATH)
