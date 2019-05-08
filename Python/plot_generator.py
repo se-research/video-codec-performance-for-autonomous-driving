@@ -8,10 +8,8 @@ import os
 # Find files.
 def run(reports, graph_path):
     for x in reports:
-        if not len(reports) == 6:
-            print('Not enough input files entered as parameters. Must be 6 '
-                  + '(One for each resoution). \n '
-                  + 'Example filename parameter: ffe-x264-vga-ultrafast.csv')
+        if len(reports) < 1:
+            print('No reports passed to plot_generator.')
             sys.exit()
 
         if not x[-4:] == '.csv':
@@ -52,15 +50,16 @@ def run(reports, graph_path):
     for file in reports:
         # Adding the different resoulutions
         # and configs to resolution_list & config_list
-        tmp = file.split('-')
-        scenario = tmp[1].replace('_', ' ')
-        codec = tmp[2]
-        resolutions.append(tmp[3])
-        substring = tmp[4]
+        splitted = file.split('/')
+        tmp = splitted[-1].split('-')
+        scenario = tmp[0].replace('_', ' ')
+        codec = tmp[1]
+        resolutions.append(tmp[2])
+        substring = tmp[3]
         substring = substring[:-4]
         configs.append(substring)
 
-    ax.set_title(scenario + ': ' + codec)
+    ax.set_title(scenario + ' : [' + codec + ']')
 
     ax.set_ylabel('ssim', color='#ee0000')
     par1.set_ylabel('size', color='#00ee00')
@@ -101,9 +100,9 @@ def run(reports, graph_path):
 
     def colorize_boxes(boxes, color, linecolor):
         for box in boxes['boxes']:
-            # change outline color
+            # Change outline color
             box.set(color=color, linewidth=1, alpha=0.7)
-            # change fill color
+            # Change fill color
             box.set(facecolor=linecolor)
 
     def get_metrics(arr_of_arrays):
@@ -174,7 +173,6 @@ def run(reports, graph_path):
     plt.xticks(np.arange(2, x_width, step=3), resolution_and_configs)
     # plt.show()
 
-    print(graph_path)
     if os.path.isdir(graph_path):
         plt.savefig(graph_path + '/' + scenario.replace(' ', '_') + '-' + codec + '.png')
     else:
