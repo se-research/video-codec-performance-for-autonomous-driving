@@ -12,14 +12,14 @@ import FFE
 width = '640'
 height = '480'
 
-N_CALLS = 15
+N_CALLS = 100
 
 config = 0
 
 INITIAL_WIDTH = '2048'
 INITIAL_HEIGHT = '1536'
 
-RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768']]#, ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']]
+RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']]
 
 
 def build():

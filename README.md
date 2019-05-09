@@ -10,3 +10,8 @@
 1. `source ~/py3-environments/coordinator/bin/activate` Activates venv
 2. `python3 coordinator.py` Runs script in venv:
 3. `deactivate` Exit venv
+
+#### Notes
+
+1. In FFE.py: start.delay parameter needs to be changed according to your machine. If the delay is too low 
+the error message recieved will be: `404 Client Error: Not Found ("No such container: ...")`
