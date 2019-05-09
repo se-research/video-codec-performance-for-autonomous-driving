@@ -7,10 +7,6 @@ import csv
 import utilities
 import FFE
 
-REPO = 'https://github.com/chalmers-revere/opendlv-video-vpx-encoder.git'
-VERSION = 'latest'
-TAG = 'vpx_encode:' + VERSION
-
 _local_variables = {}
 
 def set_report_name(name):
@@ -27,8 +23,12 @@ def initialize(init_width='0', init_height='0', resolution=['VGA', '640', '480']
     _local_variables['docker_client'] = docker_client
     _local_variables['report_name'] = report_name
 
+REPO = 'https://github.com/chalmers-revere/opendlv-video-vpx-encoder.git'
+VERSION = 'latest'
+TAG = 'vp9:' + VERSION
+
 PARAMETERS = (
-    'gop', 'threads', 'profile', 'lag_in_frame', 'drop_frame', 'resize_allowed', 'resize_up', 'resize_down',
+    'gop', 'threads', 'drop_frame', 'resize_allowed', 'resize_up', 'resize_down',
     'undershoot_pct', 'overshoot_pct', 'min_q', 'end_usage', 'buffer_size', 'buffer_init_size', 'buffer_optimal_size', 'bitrate',
     'kf_mode', 'kf_min_dist', 'kf_max_dist'
 )
@@ -37,22 +37,20 @@ PARAMETERS = (
 # Parameters according to https://www.webmproject.org/docs/encoder-parameters/
 SPACE = [Integer(1, 250, name='gop'),
          Integer(1, 4, name='threads'),
-         Integer(0, 1, name='profile'),
-         Integer(0, 25, name='lag_in_frame'),
-         Integer(0.0, 1.0, name='drop_frame'),
-         Integer(0, 1, name='resize_allowed'),
-         Integer(0.0, 1.0, name='resize_up'),
-         Integer(0.0, 1.0, name='resize_down'),
+         Integer(0, 100, name='drop_frame'),
+         Categorical((0, 1), name='resize_allowed'),
+         Integer(0, 100, name='resize_up'),
+         Integer(0, 100, name='resize_down'),
          Integer(0, 100, name='undershoot_pct'),
          Integer(0, 100, name='overshoot_pct'),
          Integer(0, 52, name='min_q'),
-         Integer(0, 1, name='end_usage'),
+         Categorical((0, 1), name='end_usage'),
          Integer(0, 6000, name='buffer_size'),
          Integer(0, 4000, name='buffer_init_size'),
          Integer(0, 5000, name='buffer_optimal_size'),
-         Integer(50000, 5000000, name='bitrate'),
-         Integer(0, 1, name='kf_mode'),
-         Integer(0, 250, name='kf_min_dist'),
+         Integer(100000, 5000000, name='bitrate'),
+         Categorical((0, 1), name='kf_mode'),
+         Categorical((0, 1), name='kf_min_dist'),
          Integer(0, 250, name='kf_max_dist')
          ]
 
@@ -60,12 +58,10 @@ SPACE = [Integer(1, 250, name='gop'),
 def get_default_encoder_config():
     return [10,  # gop
             4,  # threads
-            0,  # profile
-            0,  # lag_in_frame
             0,  # drop_frame
             0,  # resize_allowed
-            0.0,  # resize_up
-            0.0,  # resize_down
+            0,  # resize_up
+            0,  # resize_down
             0,  # undershoot_pct
             0,  # overshoot_pct
             4,  # min_q
@@ -81,7 +77,7 @@ def get_default_encoder_config():
 
 
 @use_named_args(SPACE)
-def objective(gop, threads, profile, lag_in_frame, drop_frame, resize_allowed, resize_up, resize_down,
+def objective(gop, threads, drop_frame, resize_allowed, resize_up, resize_down,
               undershoot_pct, overshoot_pct, min_q, end_usage, buffer_size, buffer_init_size,
               buffer_optimal_size, bitrate, kf_mode, kf_min_dist, kf_max_dist):
 
@@ -94,12 +90,10 @@ def objective(gop, threads, profile, lag_in_frame, drop_frame, resize_allowed, r
                     '--width=' + _local_variables['width'],
                     '--height=' + _local_variables['height'],
                     '--vp9',
-                    '--verbose',
+                    #'--verbose',
                     ###################
                     '--gop=' + str(gop),
-                    '--threads=' + str(threads),
-                    '--profile=' + str(profile),
-                    '--lag-in-frame=' + str(lag_in_frame),
+                    '--threads=4',
                     '--drop-frame=' + str(drop_frame),
                     '--resize-allowed=' + str(resize_allowed),
                     '--resize-up=' + str(resize_up),
