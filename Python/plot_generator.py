@@ -176,3 +176,5 @@ def run(reports, graph_path, dataset, codec, best_config_names, resolutions):
         except Exception as e:
             print ("Creation of the dir %s failed. Saving graph in the same folder as the script. " + e % graph_path)
             plt.savefig(dataset + '-' + codec + '.png')
+
+    plt.clf()

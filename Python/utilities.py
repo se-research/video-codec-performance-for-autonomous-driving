@@ -67,7 +67,10 @@ def save_list(list, output_path, name):
 def save_convergence(axes, encoder, resolution_name):
     axes.set_ylim(top=1, bottom=0)
     axes.set_title(get_dataset_name() + '-' + encoder.TAG + '-' + resolution_name)
-
+    
+    figure = plt.gcf()
+    figure.figsize = (16, 8)
+    
     if os.path.isdir(OUTPUT_CONVERGENCE_PATH):
         plt.savefig(
             OUTPUT_CONVERGENCE_PATH + '/' + get_dataset_name() + '-' + encoder.TAG + '-' + resolution_name + '.png')
