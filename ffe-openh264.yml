@@ -36,7 +36,7 @@ services:
         depends_on:
         - frame-feed-evaluator
         build:
-            context: https://github.com/chalmers-revere/opendlv-video-h264-encoder.git#v0.0.1
+            context: https://github.com/chalmers-revere/opendlv-video-h264-encoder.git#v0.0.2
             dockerfile: Dockerfile.amd64
         network_mode: "host"
         ipc: "host"

@@ -6,13 +6,6 @@ REPO = 'https://github.com/chrberger/frame-feed-evaluator.git'
 VERSION = 'v0.0.4'
 TAG = 'ffe:' + VERSION
 
-VOLUMES = {'/tmp/': {'bind': '/tmp', 'mode': 'rw'},
-           utilities.OUTPUT_REPORT_PATH: {'bind': '/host', 'mode': 'rw'},
-           utilities.PNGS_PATH: {
-               'bind': '/pngs',
-               'mode': 'rw'}
-           }
-
 
 def set_report_name(name):
     _local_variables['report_name'] = name
@@ -24,6 +17,15 @@ def initialize(init_width='0', init_height='0', width='0', height='0', report_na
     _local_variables['width'] = width
     _local_variables['height'] = height
     _local_variables['report_name'] = report_name
+
+
+def get_volumes():
+    return {'/tmp/': {'bind': '/tmp', 'mode': 'rw'},
+            utilities.OUTPUT_REPORT_PATH: {'bind': '/host', 'mode': 'rw'},
+            utilities.get_pngs_path(): {
+                'bind': '/pngs',
+                'mode': 'rw'}
+            }
 
 
 def get_commands():
@@ -38,7 +40,7 @@ def get_commands():
                 '--crop.height=' + _local_variables['height'],
                 '--delay=0',
                 '--delay.start=200',
-                '--stopafter=' + str(utilities.STOP_AFTER),
+                #'--stopafter=' + str(utilities.STOP_AFTER),
                 '--timeout=100'
                 # '--noexitontimeout'
                 # '--verbose',

@@ -8,11 +8,14 @@ STOP_AFTER = 80
 TIMED_OUT_MSG_BYTES = str.encode('[frame-feed-evaluator]: Timed out while waiting for encoded frame.\n')
 TIMED_OUT = False
 
-PNGS_PATH = os.path.join(os.getcwd(), '../2019-04-28_AstaZero-RuralRoad')
-OUTPUT_REPORT_PATH = os.path.join(os.getcwd(), 'reports')
-OUTPUT_CONVERGENCE_PATH = os.path.join(os.getcwd(), 'convergence')
-OUTPUT_GRAPH_PATH = os.path.join(os.getcwd(), 'graphs')
-OUTPUT_BEST_CONFIG_REPORT_PATH = os.path.join(os.getcwd(), 'best_config_report')
+pngs_path = 'not_set'
+dataset = 'not_set'
+
+DATASETS_PATH = os.path.join(os.getcwd(), '../datasets')
+OUTPUT_REPORT_PATH = os.path.join(os.getcwd(), '../reports')
+OUTPUT_CONVERGENCE_PATH = os.path.join(os.getcwd(), '../convergence')
+OUTPUT_GRAPH_PATH = os.path.join(os.getcwd(), '../graphs')
+OUTPUT_BEST_CONFIG_REPORT_PATH = os.path.join(os.getcwd(), '../best_config_report')
 
 PREFIX_COLOR_FFE = '92'
 PREFIX_COLOR_ENCODER = '94'
@@ -24,9 +27,14 @@ time_out = False
 MAX_VIOLATION = 2.5
 
 
+# Returns folders in datasets directory
+def get_datasets():
+    return os.listdir(DATASETS_PATH)
+
+
 # Returns the report_name in correct format
 def generate_report_name(tag, resolution_name, config):
-    report_name = 'ffe-AstaZero_Rural_Road-' + tag + '-' + resolution_name + '-' + 'C' + str(
+    report_name = get_dataset_name() + '-' + tag + '-' + resolution_name + '-' + 'C' + str(
         config) + '.csv'
     return report_name
 
@@ -58,21 +66,21 @@ def save_list(list, output_path, name):
 # Saves convergence graph
 def save_convergence(axes, encoder, resolution_name):
     axes.set_ylim(top=1, bottom=0)
-    axes.set_title('AstaZero_Rural_Road-' + encoder.TAG + '-' + resolution_name)
+    axes.set_title(get_dataset_name() + '-' + encoder.TAG + '-' + resolution_name)
 
     if os.path.isdir(OUTPUT_CONVERGENCE_PATH):
         plt.savefig(
-            OUTPUT_CONVERGENCE_PATH + '/' + 'AstaZero_Rural_Road-' + encoder.TAG + '-' + resolution_name + '.png')
+            OUTPUT_CONVERGENCE_PATH + '/' + get_dataset_name() + '-' + encoder.TAG + '-' + resolution_name + '.png')
     else:
         try:
             os.mkdir(OUTPUT_CONVERGENCE_PATH)
             plt.savefig(
-                OUTPUT_CONVERGENCE_PATH + '/' + 'AstaZero_Rural_Road-' + encoder.TAG + '-' + resolution_name + '.png')
+                OUTPUT_CONVERGENCE_PATH + '/' + get_dataset_name() + '-' + encoder.TAG + '-' + resolution_name + '.png')
         except Exception as e:
             print(
                 "Creation of the dir %s failed. Saving graph in the same folder as the script. " + e % OUTPUT_CONVERGENCE_PATH)
             plt.savefig(
-                OUTPUT_CONVERGENCE_PATH + '/' + 'AstaZero_Rural_Road-' + encoder.TAG + '-' + resolution_name + '.png')
+                OUTPUT_CONVERGENCE_PATH + '/' + get_dataset_name() + '-' + encoder.TAG + '-' + resolution_name + '.png')
 
     plt.clf()
 
@@ -116,3 +124,18 @@ def set_best_config_name(name):
 
 def get_best_config_name():
     return best_config_name
+
+
+def set_dataset(name):
+    global pngs_path
+    global dataset
+    dataset = name
+    pngs_path = os.path.join(os.getcwd(), '../datasets/' + name)
+
+
+def get_pngs_path():
+    return pngs_path
+
+
+def get_dataset_name():
+    return dataset
