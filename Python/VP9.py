@@ -1,4 +1,4 @@
-
+ 
 from skopt.space import Integer, Categorical
 from skopt.utils import use_named_args
 from statistics import mean
@@ -113,7 +113,7 @@ def objective(gop, threads, drop_frame, resize_allowed, resize_up, resize_down,
 
         container_ffe = _local_variables['docker_client'].containers.run(FFE.TAG,
                                                                          command=FFE.get_commands(),
-                                                                         volumes=FFE.VOLUMES,
+                                                                         volumes=FFE.get_volumes(),
                                                                          environment=['DISPLAY=:0'],
                                                                          working_dir='/host',
                                                                          network_mode="host",
