@@ -88,7 +88,7 @@ def update_report_name_callback(_):
 if __name__ == '__main__':
     docker_client = docker.from_env()
 
-    encoders = [VP9]  #H264, x264, VP9, H264]
+    encoders = [H264, VP9] #, x264]
 
     for encoder in encoders:
         build() # build FFE and encoder in case they cannot be found locally
