@@ -24,75 +24,63 @@ def initialize(init_width='0', init_height='0', resolution=['VGA', '640', '480']
     _local_variables['docker_client'] = docker_client
     _local_variables['report_name'] = report_name
 
-
-REPO = 'https://github.com/chalmers-revere/opendlv-video-h264-encoder.git'
-VERSION = 'v0.0.2'
-TAG = 'h264:' + VERSION
+REPO = 'https://github.com/guslauer/video-qsv-h264-encoder.git'
+VERSION = 'latest'  # @TODO change
+TAG = 'qsv-full:' + VERSION # @TODO change
 
 PARAMETERS = (
-    'bitrate', 'bitrate_max', 'gop', 'rc_mode', 'ecomplexity', 'sps_pps_strategy', 'num_ref_frame', 'ssei',
-    'prefix_nal', 'entropy_coding', 'frame_skip', 'qp_max', 'qp_min', 'long_term_ref', 'loop_filter', 'denoise',
-    'background_detection', 'adaptive_quant', 'frame_cropping', 'scene_change_detect', 'padding'
-)
+    'gop', 'bitrate', 'ip-period', 'init-qp', 'qpmin', 'qpmax', 'disable-frame-skip', 'diff-qp-ip', 'diff-qp-ib',
+    'num-ref-frame', 'rc-mode', 'profile', 'cabac', 'dct8x8', 'deblock-filter', 'prefix-nal', 'idr-interval')
 
-# https://www.web3.lu/avc-h264-video-settings/ # https://www.pixeltools.com/rate_control_paper.html
-# https://superuser.com/questions/638069/what-is-the-maximum-and-minimum-of-q-value-in-ffmpeg
-# https://slhck.info/video/2017/02/24/crf-guide.html
-# All parameters available in h264 and their ranges
-SPACE = [Integer(100000, 5000000, name='bitrate'),
-         Integer(100000, 5000000, name='bitrate_max'),
-         Integer(1, 250, name='gop'),
-         Integer(-1, 3, name='rc_mode'),
-         Integer(0, 2, name='ecomplexity'),
-         Categorical((0, 1, 2, 3, 6), name='sps_pps_strategy'),
-         Integer(1, 16, name='num_ref_frame'),
-         Categorical((0, 1), name='ssei'),
+
+# All parameters available in qsv-h264 and their ranges
+# https://github.com/intel/libyami-utils/blob/c64cad218e676cc02b426cb67b660d8eb2567d3b/tests/encodehelp.h
+# https://github.com/intel/libyami/blob/apache/interface/VideoEncoderDefs.h
+# https://github.com/intel/libyami-utils/blob/master/doc/yamitranscode.1
+SPACE = [Integer(1, 250, name='gop'),
+         Integer(100, 5000, name='bitrate'),
+         Integer(0, 50, name='ip_period'),  # @TODO check range
+         Integer(0, 51, name='init_qp'),
+         Integer(0, 50, name='qpmin'),
+         Integer(0, 51, name='qpmax'),
+         Categorical((0, 1), name='disable_frame_skip'),
+         Integer(0, 51, name='diff_qp_ip'),  # @TODO check range
+         Integer(0, 51, name='diff_qp_ib'),  # @TODO check range
+         Integer(0, 16, name='num_ref_frame'),
+         Integer(0, 4, name='rc_mode'),
+         Integer(0, 2, name='profile'),
+         Categorical((0, 1), name='cabac'),
+         Categorical((0, 1), name='dct8x8'),
+         Categorical((0, 1), name='deblock_filter'),
          Categorical((0, 1), name='prefix_nal'),
-         Categorical((0, 1), name='entropy_coding'),
-         Categorical((0, 1), name='frame_skip'),
-         Integer(0, 51, name='qp_max'),  # fix
-         Integer(0, 50, name='qp_min'),  # fix
-         Categorical((0, 1), name='long_term_ref'),
-         Integer(0, 2, name='loop_filter'),
-         Categorical((0, 1), name='denoise'),
-         Categorical((0, 1), name='background_detection'),
-         Categorical((0, 1), name='adaptive_quant'),
-         Categorical((0, 1), name='frame_cropping'),
-         Categorical((0, 1), name='scene_change_detect'),
-         Categorical((0, 1), name='padding')
+         Integer(0, 50, name='idr_interval')  # @TODO check range
          ]
 
 
 def get_default_encoder_config():
-
-    return [1500000,  # bitrate
-            5000000,  # max_bitrate
-            10,  # qop
-            0,  # rc_mode
-            0,  # ecomplexity
-            0,  # sps_pps_strategy
-            1,  # num_ref_frame
-            0,  # ssei
-            0,  # prefix_nal
-            0,  # entropy_coding
-            1,  # frame_skip
-            42,  # qp_max
-            12,  # qp_min
-            0,  # long_term_ref
-            0,  # loop_filter
-            0,  # denoise
-            1,  # background_detection
-            1,  # adaptive_quant
-            1,  # frame_cropping
-            1,  # scene_change_detect
-            1,  # padding
+    return [10,  # gop
+            2000,  # bitrate
+            0,  # ip-period
+            26,  # init-qp
+            1,  # qpmin
+            51,  # qpmax
+            0,  # disable-frame-skip
+            0,  # diff-qp-ip
+            0,  # diff-qp-ib
+            1,  # num-ref-frame
+            4,  # rc-mode
+            0,  # profile
+            0,  # cabac
+            0,  # dct8x8
+            0,  # deblock-filter
+            0,  # prefix-nal
+            1,  # idr-interval
             ]
 
 
 @use_named_args(SPACE)
-def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy, num_ref_frame, ssei,
-              prefix_nal, entropy_coding, frame_skip, qp_max, qp_min, long_term_ref, loop_filter, denoise,
-              background_detection, adaptive_quant, frame_cropping, scene_change_detect, padding):
+def objective(gop, bitrate, ip_period, init_qp, qpmin, qpmax, disable_frame_skip, diff_qp_ip, diff_qp_ib,
+              num_ref_frame, rc_mode, profile, cabac, dct8x8, deblock_filter, prefix_nal, idr_interval):
 
     utilities.reset_time_out()  # resets violation variable
 
@@ -102,27 +90,23 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
                     '--name=' + utilities.SHARED_MEMORY_AREA,
                     '--width=' + _local_variables['width'],
                     '--height=' + _local_variables['height'],
-                    '--bitrate=' + str(bitrate),
-                    '--bitrate-max=' + str(bitrate_max),
                     '--gop=' + str(gop),
-                    '--rc-mode=' + str(rc_mode),
-                    '--ecomplexity=' + str(ecomplexity),
-                    '--sps_pps_strategy=' + str(sps_pps_strategy),
-                    '--num_ref_frame=' + str(num_ref_frame),
-                    '--ssei=' + str(ssei),
+                    '--bitrate=' + str(bitrate),
+                    '--ip-period=' + str(ip_period),
+                    '--init_qp=' + str(init_qp),
+                    '--qpmin=' + str(qpmin),
+                    '--qpmax=' + str(qpmax),
+                    '--disable-frame-skip=' + str(disable_frame_skip),
+                    '--diff-qp-ip=' + str(diff_qp_ip),
+                    '--diff-qp-ib=' + str(diff_qp_ib),
+                    '--num-ref-frame=' + str(num_ref_frame),
+                    '--rc-mode' + str(rc_mode),
+                    '--profile=' + str(profile),
+                    '--cabac=' + str(cabac),
+                    '--dct8x8=' + str(dct8x8),
+                    '--deblock-filter' + str(deblock_filter),
                     '--prefix-nal=' + str(prefix_nal),
-                    '--entropy-coding' + str(entropy_coding),
-                    '--frame-skip=' + str(frame_skip),
-                    '--qp-max=' + str(qp_max),
-                    '--qp-min=' + str(qp_min),
-                    '--long-term-ref' + str(long_term_ref),
-                    '--loop-filter=' + str(loop_filter),
-                    '--denoise' + str(denoise),
-                    '--background-detection=' + str(background_detection),
-                    '--adaptive_quant' + str(adaptive_quant),
-                    '--frame-cropping' + str(frame_cropping),
-                    '--scene-change-detect=' + str(scene_change_detect),
-                    '--padding=' + str(padding),
+                    '--idr-interval' + str(idr_interval)
                     #'--verbose'
                     ]
 
@@ -143,6 +127,7 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
                                                                                                'mode': 'rw'}},
                                                                              network_mode="host",
                                                                              ipc_mode="host",
+                                                                             devices=['/dev/dri/renderD128:/dev/dri/renderD128:rwm'],
                                                                              remove=True,
                                                                              detach=True
                                                                              )
