@@ -102,9 +102,9 @@ if __name__ == '__main__':
 
         for encoder in encoders:
             build()  # build FFE and encoder in case they cannot be found locally
-            
-            best_config_names = []
-            best_config_report_paths = []
+
+            best_configs = []
+
             for (_, res) in enumerate(RESOLUTIONS):
                 resolution_name = res[0]
                 width = res[1]
@@ -160,8 +160,13 @@ if __name__ == '__main__':
                 utilities.save_list(best_parameters, utilities.OUTPUT_BEST_CONFIG_REPORT_PATH,
                                     utilities.get_best_config_name())
 
-                best_config_report_paths.append(utilities.OUTPUT_REPORT_PATH + '/' + utilities.get_best_config_name())
+                best_config_report_path = utilities.OUTPUT_REPORT_PATH + '/' + utilities.get_best_config_name()
+                best_config_name = utilities.get_best_config_name()
 
-                best_config_names.append(utilities.get_best_config_name())
+                # Only append list with configs to be plotted if they are valid
+                if utilities.check_config_and_path(best_config_report_path, best_config_name , encoder.TAG,
+                                                   resolution_name):
+                    best_configs.append([best_config_report_path, best_config_name, resolution_name])
 
-            plot_generator.run(best_config_report_paths, utilities.OUTPUT_GRAPH_PATH, utilities.get_dataset_name(), encoder.TAG, best_config_names, RESOLUTIONS)
+            plot_generator.run(best_configs=best_configs, output_graph_path=utilities.OUTPUT_GRAPH_PATH,
+                               dataset=utilities.get_dataset_name(), codec=encoder.TAG)

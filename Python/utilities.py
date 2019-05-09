@@ -142,3 +142,16 @@ def get_pngs_path():
 
 def get_dataset_name():
     return dataset
+
+
+# Checks if the config and the path are valid
+def check_config_and_path(config_report_path, config_name, encoder_tag, resolution):
+    if config_name == 'not_set':
+        print(
+            'No valid config for ' + dataset + ' : ' + encoder_tag + ' : ' + resolution + ' found. Ignore res in graph')
+        return False
+    elif not config_report_path[-4:] == '.csv':
+        print('Reports can only be of type .csv')
+        return False
+    else:
+        return True
