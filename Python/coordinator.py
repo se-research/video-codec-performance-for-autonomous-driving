@@ -1,128 +1,165 @@
 import docker
 import threading
+import sys
+import time
+from skopt import gp_minimize
+from skopt.plots import plot_convergence
+import plot_generator
+import utilities
+import H264
+import FFE
 
-REPO_FFE = 'https://github.com/chrberger/frame-feed-evaluator.git'
-REPO_X264 = 'https://github.com/chalmers-revere/opendlv-video-x264-encoder.git'
+width = '640'
+height = '480'
 
-VERSION_FFE = 'v0.0.4'
-TAG_FFE = 'ffe:' + VERSION_FFE
-PREFIX_COLOR_FFE = '92'
+N_CALLS = 15
 
-VERSION_ENCODER = 'v0.0.7'
-TAG_ENCODER = 'x264:' + VERSION_ENCODER
-PREFIX_COLOR_ENCODER = '94'
+config = 0
 
-PNGS_PATH = '/home/erik/Desktop/Thesis/video-codec-performance-for-autonomous-driving/2019-03-22_AstaZero_RuralRoad/'
-REPORT_PATH = '/home/erik/Desktop/coordinator'
+INITIAL_WIDTH = '2048'
+INITIAL_HEIGHT = '1536'
 
-VOLUMES_FFE = {'/tmp/': {'bind': '/tmp', 'mode': 'rw'},
-               REPORT_PATH: {'bind': '/host', 'mode': 'rw'},
-               PNGS_PATH: {
-                   'bind': '/pngs',
-                   'mode': 'rw'}
-               }
-
-COMMAND_LIST_FFE = ["--folder=/pngs",
-                    "--report=ffe-x264-python.csv",
-                    "--cid=112",
-                    "--name=video1",
-                    "--crop.x=376",
-                    "--crop.y=32",
-                    "--crop.width=640",
-                    "--crop.height=480",
-                    "--verbose",
-                    '--noexitontimeout'
-                    ]
-
-COMMAND_LIST_ENCODER = ["--cid=112",
-                        "--name=video1",
-                        "--width=640",
-                        "--height=480",
-                        "--verbose"]
+RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768']]#, ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']]
 
 
-########################################################################################################################
+def build():
+    def build_ffe():
+        try:
+            docker_client.images.get(FFE.TAG)
+            print('Found ' + FFE.TAG + ' image locally')
+        except docker.errors.ImageNotFound:
+            print(
+                'Building ' + FFE.TAG + ' from ' + FFE.REPO + '#' + FFE.VERSION + '. It may take some time...')
+            image = docker_client.images.build(path=FFE.REPO + '#' + FFE.VERSION,
+                                               dockerfile='Dockerfile.amd64',
+                                               tag=FFE.TAG,
+                                               rm=True,
+                                               forcerm=True
+                                               )
+            for x in image[1]:
+                print(x)
+        except Exception as e:
+            sys.exit(e)  # Exits script in case of failure to retrieve image
 
-# Iterates the generator and prints its log
-def print_logs(log_generator, color):
-    for x in log_generator:
-        print('\033[' + color + 'm### \033[0m' + (str(x, 'utf-8')))  # Prints with color code prefix and in utf-8
+    def build_encoder():
+        try:
+            docker_client.images.get(encoder.TAG)
+            print('Found ' + encoder.TAG + ' image locally')
+        except docker.errors.ImageNotFound:
+            print(
+                'Building ' + encoder.TAG + ' from ' + encoder.REPO + '#' + encoder.VERSION +
+                '. It may take some time...')
+            image = docker_client.images.build(path=encoder.REPO + '#' + encoder.VERSION,
+                                               dockerfile='Dockerfile.amd64',
+                                               tag=encoder.TAG,
+                                               rm=True,
+                                               forcerm=True
+                                               )
+            for x in image[1]:
+                print(x)
+        except Exception as e:
+            sys.exit(e)
+
+    thread_build_ffe = threading.Thread(target=build_ffe)
+    thread_build_encoder = threading.Thread(target=build_encoder)
+
+    thread_build_ffe.start()
+    thread_build_encoder.start()
+
+    thread_build_ffe.join()  # Blocks execution until both threads has terminated
+    thread_build_encoder.join()
 
 
-client = docker.from_env()
+def update_report_name_callback(_):
+    global config
+    if config < N_CALLS:
+        config += 1
+    else:
+        config = 0
+
+    report_name = utilities.generate_report_name(tag=encoder.TAG, resolution_name=resolution_name,
+                                                 config=config)
+    FFE.set_report_name(report_name)
+    encoder.set_report_name(report_name)
 
 
-def build_ffe():
-    try:
-        client.images.get(TAG_FFE)
-        print('Found ' + TAG_FFE + ' image locally')
-    except docker.errors.ImageNotFound:
-        print('Building ' + TAG_FFE + ' from ' + REPO_FFE + '#' + VERSION_ENCODER + '. It may take some time...')
-        image = client.images.build(path=REPO_FFE + '#' + VERSION_FFE,
-                                    dockerfile='Dockerfile.amd64',
-                                    tag=TAG_FFE,
-                                    rm=True,
-                                    forcerm=True
-                                    )
-        # @TODO     docker image prune --filter label=stage=intermediate    to remove intermediate builder image
-        for x in image[1]:
-            print(x)
-    except Exception as e:
-        sys.exit(e)  # Exits script in case of failure to retrieve image
+if __name__ == '__main__':
+    docker_client = docker.from_env()
 
+    encoders = [H264]  # x264, VPX]
 
-def build_encoder():
-    try:
-        client.images.get(TAG_ENCODER)
-        print('Found ' + TAG_ENCODER + ' image locally')
-    except docker.errors.ImageNotFound:
-        print('Building ' + TAG_ENCODER + ' from ' + REPO_X264 + '#' + VERSION_ENCODER + '. It may take some time...')
-        image = client.images.build(path=REPO_X264 + '#' + VERSION_ENCODER,
-                                    dockerfile='Dockerfile.amd64',
-                                    tag=TAG_ENCODER,
-                                    rm=True,
-                                    forcerm=True
-                                    )
-        # @TODO     docker image prune --filter label=stage=intermediate    to remove intermediate builder image
-        for x in image[1]:
-            print(x)
-    except Exception as e:
-        sys.exit(e)
+    datasets = utilities.get_datasets()
+    if not datasets:
+        print("No folders found in " + utilities.DATASETS_PATH)
+        sys.exit("Exiting..")
+    else:
+        print("Following datasets are to be evaluated: " + str(datasets))
 
+    for dataset in datasets:
+        utilities.set_dataset(dataset)
 
-thread_build_ffe = threading.Thread(target=build_ffe)
-thread_build_encoder = threading.Thread(target=build_encoder)
+        for encoder in encoders:
+            build()  # build FFE and encoder in case they cannot be found locally
+            
+            best_config_names = []
+            best_config_report_paths = []
+            for (_, res) in enumerate(RESOLUTIONS):
+                resolution_name = res[0]
+                width = res[1]
+                height = res[2]
+                utilities.set_max_ssim(0)  # reset max_ssim and best_config_name for each resolution
+                utilities.set_best_config_name('not_set')
 
-thread_build_ffe.start()
-thread_build_encoder.start()
+                encoder.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, resolution=res,
+                                   docker_client=docker_client)
+                FFE.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, width=width, height=height)
 
-thread_build_ffe.join()  # Blocks execution until both threads has terminated
-thread_build_encoder.join()
+                update_report_name_callback(_)
 
-container_ffe = client.containers.run(TAG_FFE,
-                                      command=COMMAND_LIST_FFE,
-                                      volumes=VOLUMES_FFE,
-                                      environment=['DISPLAY=:0'],
-                                      working_dir='/host',
-                                      network_mode="host",
-                                      ipc_mode="host",
-                                      remove=True,
-                                      detach=True,
-                                      )
+                start = time.time()
 
-container_encoder = client.containers.run(TAG_ENCODER,
-                                          command=COMMAND_LIST_ENCODER,
-                                          volumes={'/tmp': {'bind': '/tmp', 'mode': 'rw'}},
-                                          network_mode="host",
-                                          ipc_mode="host",
-                                          remove=True,
-                                          detach=True
-                                          )
+                minimize_result = gp_minimize(func=encoder.objective,
+                                              dimensions=encoder.SPACE,
+                                              base_estimator=None,
+                                              n_calls=N_CALLS,
+                                              n_random_starts=10,
+                                              acq_func="gp_hedge",
+                                              acq_optimizer="auto",
+                                              x0=encoder.get_default_encoder_config(),
+                                              y0=None,
+                                              random_state=None,
+                                              verbose=True,
+                                              callback=update_report_name_callback,
+                                              n_points=10000,
+                                              n_restarts_optimizer=5,
+                                              xi=0.01,
+                                              kappa=1.96,
+                                              noise="gaussian",
+                                              n_jobs=1,
+                                              )
 
-thread_logs_ffe = threading.Thread(target=print_logs, args=[container_ffe.logs(stream=True), PREFIX_COLOR_FFE])
-thread_logs_encoder = threading.Thread(target=print_logs, args=[container_encoder.logs(stream=True),
-                                                                PREFIX_COLOR_ENCODER])
+                now = time.time()
 
-thread_logs_ffe.start()
-thread_logs_encoder.start()
+                print("Best score=%.4f" % minimize_result.fun)
+                print("Best parameters:")
 
+                best_parameters = []
+                i = 0
+                for value in minimize_result.x:
+                    best_parameters.append(encoder.PARAMETERS[i] + ': ' + str(value) + '\n')
+                    print(encoder.PARAMETERS[i] + ': ' + str(value))  # prints parameters that obtained the highest SSIM
+                    i += 1
+                print("Best config: " + utilities.get_best_config_name())
+                print("It took: ", str((now - start) / 60), " minutes")
+
+                ax = plot_convergence(minimize_result)
+                utilities.save_convergence(axes=ax, encoder=encoder, resolution_name=resolution_name)
+
+                utilities.save_list(best_parameters, utilities.OUTPUT_BEST_CONFIG_REPORT_PATH,
+                                    utilities.get_best_config_name())
+
+                best_config_report_paths.append(utilities.OUTPUT_REPORT_PATH + '/' + utilities.get_best_config_name())
+
+                best_config_names.append(utilities.get_best_config_name())
+
+            plot_generator.run(best_config_report_paths, utilities.OUTPUT_GRAPH_PATH, utilities.get_dataset_name(), encoder.TAG, best_config_names, RESOLUTIONS)

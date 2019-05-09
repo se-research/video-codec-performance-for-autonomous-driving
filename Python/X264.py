@@ -1,0 +1,14 @@
+REPO_X264_FULL = 'https://github.com/guslauer/opendlv-video-x264-encoder.git'
+
+'''
+VERSION_ENCODER = 'v0.0.7'
+TAG_ENCODER = 'x264:' + VERSION_ENCODER
+PREFIX_COLOR_ENCODER = '94'
+
+VERSION_ENCODER = 'v0.0.7'
+TAG_ENCODER = 'x264-full:' + VERSION_ENCODER
+PREFIX_COLOR_ENCODER = '94'
+
+
+
+'''

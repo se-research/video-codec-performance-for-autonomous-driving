@@ -25,11 +25,11 @@ services:
         volumes:
         - /tmp:/tmp
         - $PWD:/host
-        - $PWD/example:/pngs
+        - $PWD/2019-03-22_AstaZero_RuralRoad:/pngs
         working_dir: /host
         environment:
         - DISPLAY=$DISPLAY
-        command: "--folder=/pngs --report=ffe-x264.csv --cid=111 --name=video0 --crop.x=376 --crop.y=32 --crop.width=640 --crop.height=480 --delay=0"
+        command: "--folder=/pngs --report=ffe-x264.csv --cid=111 --name=video0 --crop.x=0 --crop.y=0 --crop.width=2048 --crop.height=1536 --verbose --noexitontimeout"
 
     video-x264-encoder-amd64:
         container_name: x264
@@ -42,4 +42,4 @@ services:
         ipc: "host"
         volumes:
         - /tmp:/tmp
-        command: "--cid=111 --name=video0 --width=640 --height=480"
+        command: "--cid=111 --name=video0 --width=2048 --height=1536 --verbose"
