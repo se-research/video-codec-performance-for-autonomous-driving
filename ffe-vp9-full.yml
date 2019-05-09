@@ -25,7 +25,7 @@ services:
         volumes:
         - /tmp:/tmp
         - $PWD:/host
-        - $PWD/2019-03-22_AstaZero_RuralRoad:/pngs
+        - $PWD/2019-04-28_AstaZero-RuralRoad:/pngs
         working_dir: /host
         environment:
         - DISPLAY=$DISPLAY
@@ -35,9 +35,9 @@ services:
         container_name: vp9_test
         depends_on:
         - frame-feed-evaluator
-        image: vpx_encode:latest
+        image: vp9:latest
         network_mode: "host"
         ipc: "host"
         volumes:
         - /tmp:/tmp
-        command: "--cid=111 --name=video0 --width=640 --height=480 --verbose --vp9 --threads=4 --profile=0 --stereo-mode=mono --lag-in-frames=0 --drop-frame=0 --resize-allowed=true --resize-up=0 --resize-down=0 --end-usage=1 --min-q=0 --undershoot-pct=0 --overshoot-pct=0 --buffer-size=6000 --buffer-init-size=4000 --buffer-optimal-size=5000 --kf-mode=0 --kf-min-dist=0 --kf-max-dist=99999 --gop=21"
+        command: "--cid=111 --name=video0 --width=640 --height=480 --verbose --vp9 --bitrate=476083 --drop-frame=42 --resize-allowed=1 --resize-up=71 --resize-down=65 --end-usage=1 --min-q=48 --undershoot-pct=5 --overshoot-pct=4 --buffer-size=5707 --buffer-init-size=3579 --buffer-optimal-size=2676 --kf-mode=0 --kf-min-dist=0 --kf-max-dist=198 --gop=159"
