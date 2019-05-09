@@ -4,9 +4,8 @@ import csv
 import sys
 import os
 
-
 # Find files.
-def run(reports, graph_path):
+def run(reports, graph_path, dataset, codec, best_config_names, resolutions):
     for x in reports:
         if len(reports) < 1:
             print('No reports passed to plot_generator.')
@@ -14,7 +13,8 @@ def run(reports, graph_path):
 
         if not x[-4:] == '.csv':
             print('Params can only be of type .csv')
-            sys.exit()
+            reports.remove(x)
+
 
     y_ssim = []
     y_size = []
@@ -27,7 +27,7 @@ def run(reports, graph_path):
             sp.set_visible(False)
 
     # Multiple box plots on one Axes
-    fig, ax = plt.subplots(sharey=False, sharex=True)
+    fig, ax = plt.subplots(sharey=False, sharex=True, figsize=(16, 8))
     fig.subplots_adjust(right=0.75)
 
     ax.autoscale_view(scalex=True)
@@ -43,27 +43,15 @@ def run(reports, graph_path):
     par1.tick_params(axis='y', colors='#00ee00')
     par2.tick_params(axis='y', colors='#0000ee')
 
-    scenario = ''
-    codec = ''
-    resolutions = []
-    configs = []
-    for file in reports:
-        # Adding the different resoulutions
-        # and configs to resolution_list & config_list
-        splitted = file.split('/')
-        tmp = splitted[-1].split('-')
-        scenario = tmp[0].replace('_', ' ')
-        codec = tmp[1]
-        resolutions.append(tmp[2])
-        substring = tmp[3]
-        substring = substring[:-4]
-        configs.append(substring)
+    ax.set_ylim(top=1, bottom=0)
+    par1.set_ylim(top=65600, bottom=0)
+    par2.set_ylim(top=40000, bottom=0)
+    
+    ax.set_title(dataset + ' : [' + codec + ']')
 
-    ax.set_title(scenario + ' : [' + codec + ']')
-
-    ax.set_ylabel('ssim', color='#ee0000')
-    par1.set_ylabel('size', color='#00ee00')
-    par2.set_ylabel('time', color='#0000ee')
+    ax.set_ylabel('ssim', color='#ee0000', fontsize = 'x-large')
+    par1.set_ylabel('size', color='#00ee00', fontsize = 'x-large')
+    par2.set_ylabel('time', color='#0000ee', fontsize = 'x-large')
 
     position_x = [[], [], []]
     ssim_x = 1
@@ -87,12 +75,16 @@ def run(reports, graph_path):
             position_x[1].append(size_x)
             position_x[0].append(ssim_x)
             position_x[2].append(time_x)
+            # Do not add delimiter line on the last item.
+            if not i == (len(reports) - 1):
+                ax.axvline(x = time_x + 0.5, color = '#000000')
             ssim_x += 3
             size_x += 3
             time_x += 3
             tmp_ssim = []
             tmp_size = []
             tmp_time = []
+
 
     ssim_boxes = ax.boxplot(y_ssim, positions=position_x[0], showfliers=False, patch_artist=True)
     size_boxes = par1.boxplot(y_size, positions=position_x[1], showfliers=False, patch_artist=True)
@@ -164,21 +156,23 @@ def run(reports, graph_path):
     plt.xlim([0, x_width])
 
     resolution_and_configs = []
-    for i, r in enumerate(resolutions):
-        resolution_and_configs.append(r + '\n')
+    for r in resolutions:
+        resolution_and_configs.append(r[0] + '\n')
 
-    for i, c in enumerate(configs):
-        resolution_and_configs[i] += c
+    # Extract config number from best config name.
+    for i, c in enumerate(best_config_names):
+        firstStep = c.split('.')[-2]
+        secondStep = firstStep.split('-')[-1]
+        resolution_and_configs[i] += secondStep
 
     plt.xticks(np.arange(2, x_width, step=3), resolution_and_configs)
-    # plt.show()
 
     if os.path.isdir(graph_path):
-        plt.savefig(graph_path + '/' + scenario.replace(' ', '_') + '-' + codec + '.png')
+        plt.savefig(graph_path + '/' + dataset + '-' + codec + '.png')
     else:
         try:
             os.mkdir(graph_path)
-            plt.savefig(graph_path + '/' + scenario.replace(' ', '_') + '-' + codec + '.png')
+            plt.savefig(graph_path + '/' + dataset + '-' + codec + '.png')
         except Exception as e:
             print ("Creation of the dir %s failed. Saving graph in the same folder as the script. " + e % graph_path)
-            plt.savefig(scenario.replace(' ', '_') + '-' + codec + '.png')
+            plt.savefig(dataset + '-' + codec + '.png')

@@ -12,15 +12,14 @@ import FFE
 width = '640'
 height = '480'
 
-N_CALLS = 50
+N_CALLS = 15
 
 config = 0
 
 INITIAL_WIDTH = '2048'
 INITIAL_HEIGHT = '1536'
 
-RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['WXGA', '1280', '720'],
-               ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']]
+RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768']]#, ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']]
 
 
 def build():
@@ -101,7 +100,8 @@ if __name__ == '__main__':
 
         for encoder in encoders:
             build()  # build FFE and encoder in case they cannot be found locally
-
+            
+            best_config_names = []
             best_config_report_paths = []
             for (_, res) in enumerate(RESOLUTIONS):
                 resolution_name = res[0]
@@ -160,4 +160,6 @@ if __name__ == '__main__':
 
                 best_config_report_paths.append(utilities.OUTPUT_REPORT_PATH + '/' + utilities.get_best_config_name())
 
-            plot_generator.run(best_config_report_paths, utilities.OUTPUT_GRAPH_PATH)
+                best_config_names.append(utilities.get_best_config_name())
+
+            plot_generator.run(best_config_report_paths, utilities.OUTPUT_GRAPH_PATH, utilities.get_dataset_name(), encoder.TAG, best_config_names, RESOLUTIONS)
