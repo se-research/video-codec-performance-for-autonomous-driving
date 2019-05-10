@@ -24,11 +24,11 @@ def initialize(init_width='0', init_height='0', resolution=['VGA', '640', '480']
     _local_variables['report_name'] = report_name
 
 REPO = 'https://github.com/chalmers-revere/opendlv-video-vpx-encoder.git'
-VERSION = 'latest'
+VERSION = 'v0.0.7'
 TAG = 'vp9:' + VERSION
 
 PARAMETERS = (
-    'gop', 'threads', 'drop_frame', 'resize_allowed', 'resize_up', 'resize_down',
+    'gop', 'drop_frame', 'resize_allowed', 'resize_up', 'resize_down',
     'undershoot_pct', 'overshoot_pct', 'min_q', 'end_usage', 'buffer_size', 'buffer_init_size', 'buffer_optimal_size', 'bitrate',
     'kf_mode', 'kf_min_dist', 'kf_max_dist'
 )
@@ -36,7 +36,6 @@ PARAMETERS = (
 # http://doxygen.db48x.net/mozilla/html/structvpx__codec__enc__cfg.html
 # Parameters according to https://www.webmproject.org/docs/encoder-parameters/
 SPACE = [Integer(1, 250, name='gop'),
-         Integer(1, 4, name='threads'),
          Integer(0, 100, name='drop_frame'),
          Categorical((0, 1), name='resize_allowed'),
          Integer(0, 100, name='resize_up'),
@@ -57,7 +56,6 @@ SPACE = [Integer(1, 250, name='gop'),
 
 def get_default_encoder_config():
     return [10,  # gop
-            4,  # threads
             0,  # drop_frame
             0,  # resize_allowed
             0,  # resize_up
@@ -77,7 +75,7 @@ def get_default_encoder_config():
 
 
 @use_named_args(SPACE)
-def objective(gop, threads, drop_frame, resize_allowed, resize_up, resize_down,
+def objective(gop, drop_frame, resize_allowed, resize_up, resize_down,
               undershoot_pct, overshoot_pct, min_q, end_usage, buffer_size, buffer_init_size,
               buffer_optimal_size, bitrate, kf_mode, kf_min_dist, kf_max_dist):
 

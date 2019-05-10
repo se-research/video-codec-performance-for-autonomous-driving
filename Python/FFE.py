@@ -39,7 +39,7 @@ def get_commands():
                 '--crop.width=' + _local_variables['width'],
                 '--crop.height=' + _local_variables['height'],
                 '--delay=0',
-                '--delay.start=200',
+                '--delay.start=3000',
                 #'--stopafter=' + str(utilities.STOP_AFTER),
                 '--timeout=100'
                 # '--noexitontimeout'

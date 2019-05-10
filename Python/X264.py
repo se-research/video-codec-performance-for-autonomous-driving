@@ -135,7 +135,8 @@ def objective(gop, preset, tune, scenecut, intra_refresh, bframe, badapt, cabac,
                     '--merange=' + str(merange),
                     '--subme=' + str(subme),
                     '--trellis=' + str(trellis),
-                    '--nr=' + str(nr)
+                    '--nr=' + str(nr),
+                    '--threads=4'
                     #'--verbose'
                     ]
 
