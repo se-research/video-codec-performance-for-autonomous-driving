@@ -38,12 +38,12 @@ def get_commands():
                 '--crop.y=' + utilities.calculate_crop_y(_local_variables['init_height'], _local_variables['height']),
                 '--crop.width=' + _local_variables['width'],
                 '--crop.height=' + _local_variables['height'],
-                '--delay=300',
-                '--delay.start=300',
+                '--delay=0',
+                '--delay.start=500',
                 #'--stopafter=' + str(utilities.STOP_AFTER),
                 '--timeout=100',
                 # '--noexitontimeout'
-                '--verbose'
+                #'--verbose'
                 ]
     else:
         raise Exception('FFE was never initialized. Run the initialize method.')

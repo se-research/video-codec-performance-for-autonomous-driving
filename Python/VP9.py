@@ -89,7 +89,7 @@ def objective(gop, drop_frame, resize_allowed, resize_up, resize_down,
                     '--width=' + _local_variables['width'],
                     '--height=' + _local_variables['height'],
                     '--vp9',
-                    #'--verbose',
+                    '--verbose',
                     ###################
                     '--gop=' + str(gop),
                     '--threads=4',
