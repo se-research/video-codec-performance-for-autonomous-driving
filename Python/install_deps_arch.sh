@@ -1,9 +1,9 @@
 #!/bin/bash
-pacman -S --noconfirm python
-pacman -S --noconfirm tk
-pacman -S --noconfirm python-virtualenv
+#pacman -S python
+pacman -S tk
+pacman -S python-virtualenv
 
-python3 -m venv ~/py3-environments/coordinator
-source ~/py3-environments/coordinator/bin/activate
+python3 -m venv ~/joacimerik/py3-environments/coordinator
+source ~/joacimerik/py3-environments/coordinator/bin/activate
 
 pip3 install -r requirements.txt
