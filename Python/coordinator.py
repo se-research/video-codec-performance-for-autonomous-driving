@@ -23,8 +23,8 @@ config = 0
 INITIAL_WIDTH = '2048'
 INITIAL_HEIGHT = '1536'
 
-RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']]
-
+#RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']]
+RESOLUTIONS = [['QXGA', '2048', '1536']]
 
 def build():
     def build_ffe():
@@ -90,7 +90,7 @@ def update_report_name_callback(_):
 if __name__ == '__main__':
     docker_client = docker.from_env()
 
-    encoders = [X264, H264, QSV_H264, VP9, QSV_VP9]
+    encoders = [QSV_VP9, VP9, QSV_H264, X264, H264]
 
     datasets = utilities.get_datasets()
     if not datasets:
