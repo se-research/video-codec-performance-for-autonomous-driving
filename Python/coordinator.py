@@ -9,6 +9,7 @@ import utilities
 import QSV_H264
 import QSV_VP9
 import H264
+import X264
 import VP9
 import FFE
 
@@ -89,7 +90,7 @@ def update_report_name_callback(_):
 if __name__ == '__main__':
     docker_client = docker.from_env()
 
-    encoders = [H264, VP9, QSV_H264, QSV_VP9]  # X264
+    encoders = [X264, H264, QSV_H264, VP9, QSV_VP9]
 
     datasets = utilities.get_datasets()
     if not datasets:

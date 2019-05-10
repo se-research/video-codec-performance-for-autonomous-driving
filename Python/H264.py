@@ -64,7 +64,6 @@ SPACE = [Integer(100000, 5000000, name='bitrate'),
 
 
 def get_default_encoder_config():
-
     return [1500000,  # bitrate
             5000000,  # max_bitrate
             10,  # qop
@@ -94,6 +93,7 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
               prefix_nal, entropy_coding, frame_skip, qp_max, qp_min, long_term_ref, loop_filter, denoise,
               background_detection, adaptive_quant, frame_cropping, scene_change_detect, padding):
 
+    print(TAG)
     utilities.reset_time_out()  # resets violation variable
 
     try:  # try/catch to catch when the containers crash due to illegal parameter combination
@@ -123,6 +123,7 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
                     '--frame-cropping' + str(frame_cropping),
                     '--scene-change-detect=' + str(scene_change_detect),
                     '--padding=' + str(padding),
+                    '--threads=4'
                     #'--verbose'
                     ]
 

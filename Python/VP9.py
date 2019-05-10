@@ -81,6 +81,7 @@ def objective(gop, threads, drop_frame, resize_allowed, resize_up, resize_down,
               undershoot_pct, overshoot_pct, min_q, end_usage, buffer_size, buffer_init_size,
               buffer_optimal_size, bitrate, kf_mode, kf_min_dist, kf_max_dist):
 
+    print(TAG)
     utilities.reset_time_out()  # resets violation variable
 
     try:  # try/catch to catch when the containers crash due to illegal parameter combination

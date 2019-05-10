@@ -82,6 +82,7 @@ def get_default_encoder_config():
 def objective(gop, bitrate, ip_period, init_qp, qpmin, qpmax, disable_frame_skip, diff_qp_ip, diff_qp_ib,
               num_ref_frame, rc_mode, profile, cabac, dct8x8, deblock_filter, prefix_nal, idr_interval):
 
+    print(TAG)
     utilities.reset_time_out()  # resets violation variable
 
     try:  # try/catch to catch when the containers crash due to illegal parameter combination
