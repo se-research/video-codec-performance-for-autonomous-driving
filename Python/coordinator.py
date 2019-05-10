@@ -7,6 +7,7 @@ from skopt.plots import plot_convergence
 import plot_generator
 import utilities
 import QSV_H264
+import QSV_VP9
 import H264
 import VP9
 import FFE
@@ -88,7 +89,7 @@ def update_report_name_callback(_):
 if __name__ == '__main__':
     docker_client = docker.from_env()
 
-    encoders = [H264, VP9, QSV_H264]  # x264, VPX]
+    encoders = [H264, VP9, QSV_H264, QSV_VP9]  # X264
 
     datasets = utilities.get_datasets()
     if not datasets:
