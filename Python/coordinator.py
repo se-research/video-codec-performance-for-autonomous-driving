@@ -16,7 +16,7 @@ import FFE
 width = '640'
 height = '480'
 
-N_CALLS = 100
+N_CALLS = 20
 
 config = 0
 
@@ -24,7 +24,6 @@ INITIAL_WIDTH = '2048'
 INITIAL_HEIGHT = '1536'
 
 RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']]
-
 
 def build():
     def build_ffe():
@@ -131,7 +130,7 @@ if __name__ == '__main__':
                                               n_random_starts=10,
                                               acq_func="gp_hedge",
                                               acq_optimizer="auto",
-                                              x0=encoder.get_default_encoder_config(),
+                                              x0=encoder.get_default_encoder_config(resolution_name),
                                               y0=None,
                                               random_state=None,
                                               verbose=True,

@@ -10,6 +10,8 @@ STOP_AFTER = 80
 TIMED_OUT_MSG_BYTES = str.encode('[frame-feed-evaluator]: Timed out while waiting for encoded frame.\n')
 TIMED_OUT = False
 
+CONTAINER_THREAD_TIME_OUT = 3600
+
 pngs_path = 'not_set'
 dataset = 'not_set'
 

@@ -2,6 +2,7 @@
 from skopt.space import Integer, Categorical
 from skopt.utils import use_named_args
 from statistics import mean
+import signal
 import threading
 import csv
 import utilities
@@ -54,25 +55,133 @@ SPACE = [Integer(1, 250, name='gop'),
          ]
 
 
-def get_default_encoder_config():
-    return [10,  # gop
-            0,  # drop_frame
-            0,  # resize_allowed
-            0,  # resize_up
-            0,  # resize_down
-            0,  # undershoot_pct
-            0,  # overshoot_pct
-            4,  # min_q
-            0,  # end_usage
-            6000,  # buffer_size
-            4000,  # buffer_init_size
-            5000, # buffer_optimal_size
-            800000,  # bitrate
-            0,  # kf_mode
-            0,  # kf_min_dist
-            250,  # kf_max_dist
-            ]
-
+def get_default_encoder_config(resolution):
+    if resolution == 'VGA':
+        return [26,  # gop
+                67,  # drop_frame
+                0,  # resize_allowed
+                87,  # resize_up
+                30,  # resize_down
+                22,  # undershoot_pct
+                85,  # overshoot_pct
+                17,  # min_q
+                1,  # end_usage
+                3264,  # buffer_size
+                3268,  # buffer_init_size
+                3519, # buffer_optimal_size
+                2168373,  # bitrate
+                1,  # kf_mode
+                0,  # kf_min_dist
+                93,  # kf_max_dist
+                ]
+    elif resolution == 'SVGA':
+        return [159,  # gop
+                0,  # drop_frame
+                1,  # resize_allowed
+                0,  # resize_up
+                93,  # resize_down
+                95,  # undershoot_pct
+                16,  # overshoot_pct
+                13,  # min_q
+                0,  # end_usage
+                6000,  # buffer_size
+                1147,  # buffer_init_size
+                0, # buffer_optimal_size
+                3895523,  # bitrate
+                1,  # kf_mode
+                1,  # kf_min_dist
+                163,  # kf_max_dist
+                ]
+    elif resolution == 'XGA':
+        return [68,  # gop
+                18,  # drop_frame
+                1,  # resize_allowed
+                90,  # resize_up
+                100,  # resize_down
+                31,  # undershoot_pct
+                31,  # overshoot_pct
+                44,  # min_q
+                1,  # end_usage
+                5425,  # buffer_size
+                4000,  # buffer_init_size
+                1445, # buffer_optimal_size
+                2194015,  # bitrate
+                0,  # kf_mode
+                0,  # kf_min_dist
+                173,  # kf_max_dist
+                ]
+    elif resolution == 'WXGA':
+        return [243,  # gop
+                0,  # drop_frame
+                1,  # resize_allowed
+                73,  # resize_up
+                28,  # resize_down
+                20,  # undershoot_pct
+                0,  # overshoot_pct
+                26,  # min_q
+                0,  # end_usage
+                0,  # buffer_size
+                0,  # buffer_init_size
+                3275, # buffer_optimal_size
+                3559766,  # bitrate
+                1,  # kf_mode
+                0,  # kf_min_dist
+                0,  # kf_max_dist
+                ]
+    elif resolution == 'KITTY':
+        return [250,  # gop
+                0,  # drop_frame
+                0,  # resize_allowed
+                100,  # resize_up
+                100,  # resize_down
+                100,  # undershoot_pct
+                0,  # overshoot_pct
+                41,  # min_q
+                1,  # end_usage
+                6000,  # buffer_size
+                444,  # buffer_init_size
+                3547, # buffer_optimal_size
+                5000000,  # bitrate
+                0,  # kf_mode
+                0,  # kf_min_dist
+                250,  # kf_max_dist
+                ]
+    elif resolution == 'FHD':
+        return [250,  # gop
+                0,  # drop_frame
+                0,  # resize_allowed
+                100,  # resize_up
+                100,  # resize_down
+                100,  # undershoot_pct
+                0,  # overshoot_pct
+                41,  # min_q
+                1,  # end_usage
+                6000,  # buffer_size
+                444,  # buffer_init_size
+                3547, # buffer_optimal_size
+                5000000,  # bitrate
+                0,  # kf_mode
+                0,  # kf_min_dist
+                250,  # kf_max_dist
+                ]
+    elif resolution == 'QXGA':
+        return [250,  # gop
+                0,  # drop_frame
+                0,  # resize_allowed
+                100,  # resize_up
+                100,  # resize_down
+                100,  # undershoot_pct
+                0,  # overshoot_pct
+                41,  # min_q
+                1,  # end_usage
+                6000,  # buffer_size
+                444,  # buffer_init_size
+                3547, # buffer_optimal_size
+                5000000,  # bitrate
+                0,  # kf_mode
+                0,  # kf_min_dist
+                250,  # kf_max_dist
+                ]
 
 @use_named_args(SPACE)
 def objective(gop, drop_frame, resize_allowed, resize_up, resize_down,
@@ -134,11 +243,25 @@ def objective(gop, drop_frame, resize_allowed, resize_up, resize_down,
                                            args=[container_ffe.logs(stream=True), utilities.PREFIX_COLOR_FFE])
         thread_logs_encoder = threading.Thread(target=utilities.log_helper, args=[container_encoder.logs(stream=True),
                                                                                   utilities.PREFIX_COLOR_ENCODER])
+        def handler(signum, frame):
+            print('Signal handler called with signal', signum)
+            container_ffe.kill()
+            container_encoder.kill()
+
+        # Setup alarm on threads, if the container does not terminate before 
+        # the CONTAINER_THREAD_TIMEOUT a kill signal is called. 
+        # Only availible on unix systems. 
+        signal.signal(signal.SIGALRM, handler)
+        signal.alarm(utilities.CONTAINER_THREAD_TIME_OUT)
+
         thread_logs_ffe.start()
         thread_logs_encoder.start()
 
         thread_logs_ffe.join()  # Blocks execution until both threads has terminated
         thread_logs_encoder.join()
+
+        # Disable the alarm
+        signal.alarm(0)          
 
     except Exception as e:
         print(e)

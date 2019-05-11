@@ -1,6 +1,7 @@
 from skopt.space import Integer, Categorical
 from skopt.utils import use_named_args
 from statistics import mean
+import signal
 import threading
 import csv
 import utilities
@@ -57,25 +58,140 @@ SPACE = [Integer(1, 250, name='gop'),
          ]
 
 
-def get_default_encoder_config():
-    return [10,  # gop
-            2000,  # bitrate
-            0,  # ip-period
-            26,  # init-qp
-            1,  # qpmin
-            51,  # qpmax
-            0,  # disable-frame-skip
-            0,  # diff-qp-ip
-            0,  # diff-qp-ib
-            1,  # num-ref-frame
-            4,  # rc-mode
-            0,  # profile
-            0,  # cabac
-            0,  # dct8x8
-            0,  # deblock-filter
-            0,  # prefix-nal
-            1,  # idr-interval
-            ]
+def get_default_encoder_config(resolution):
+    if resolution == 'VGA':
+        return [160,  # gop
+                2868,  # bitrate
+                20,  # ip-period
+                25,  # init-qp
+                1,  # qpmin
+                25,  # qpmax
+                0,  # disable-frame-skip
+                12,  # diff-qp-ip
+                31,  # diff-qp-ib
+                10,  # num-ref-frame
+                1,  # rc-mode
+                2,  # profile
+                1,  # cabac
+                1,  # dct8x8
+                0,  # deblock-filter
+                0,  # prefix-nal
+                31,  # idr-interval
+                ]
+    elif resolution == 'SVGA':
+        return [225,  # gop
+                2253,  # bitrate
+                35,  # ip-period
+                13,  # init-qp
+                27,  # qpmin
+                41,  # qpmax
+                1,  # disable-frame-skip
+                20,  # diff-qp-ip
+                17,  # diff-qp-ib
+                11,  # num-ref-frame
+                3,  # rc-mode
+                1,  # profile
+                1,  # cabac
+                1,  # dct8x8
+                0,  # deblock-filter
+                0,  # prefix-nal
+                22,  # idr-interval
+                ]
+    elif resolution == 'XGA':
+        return [47,  # gop
+                2474,  # bitrate
+                35,  # ip-period
+                37,  # init-qp
+                24,  # qpmin
+                25,  # qpmax
+                0,  # disable-frame-skip
+                7,  # diff-qp-ip
+                21,  # diff-qp-ib
+                9,  # num-ref-frame
+                2,  # rc-mode
+                2,  # profile
+                1,  # cabac
+                0,  # dct8x8
+                0,  # deblock-filter
+                1,  # prefix-nal
+                45,  # idr-interval
+                ]
+    elif resolution == 'WXGA':
+        return [47,  # gop
+                2474,  # bitrate
+                35,  # ip-period
+                37,  # init-qp
+                24,  # qpmin
+                25,  # qpmax
+                0,  # disable-frame-skip
+                7,  # diff-qp-ip
+                21,  # diff-qp-ib
+                9,  # num-ref-frame
+                2,  # rc-mode
+                2,  # profile
+                1,  # cabac
+                0,  # dct8x8
+                0,  # deblock-filter
+                1,  # prefix-nal
+                45,  # idr-interval
+                ]
+    elif resolution == 'KITTY':
+        return [47,  # gop
+                2474,  # bitrate
+                35,  # ip-period
+                37,  # init-qp
+                24,  # qpmin
+                25,  # qpmax
+                0,  # disable-frame-skip
+                7,  # diff-qp-ip
+                21,  # diff-qp-ib
+                9,  # num-ref-frame
+                2,  # rc-mode
+                2,  # profile
+                1,  # cabac
+                0,  # dct8x8
+                0,  # deblock-filter
+                1,  # prefix-nal
+                45,  # idr-interval
+                ]
+    elif resolution == 'FHD':
+        return [47,  # gop
+                2474,  # bitrate
+                35,  # ip-period
+                37,  # init-qp
+                24,  # qpmin
+                25,  # qpmax
+                0,  # disable-frame-skip
+                7,  # diff-qp-ip
+                21,  # diff-qp-ib
+                9,  # num-ref-frame
+                2,  # rc-mode
+                2,  # profile
+                1,  # cabac
+                0,  # dct8x8
+                0,  # deblock-filter
+                1,  # prefix-nal
+                45,  # idr-interval
+                ]
+    elif resolution == 'QXGA':
+        return [47,  # gop
+                2474,  # bitrate
+                35,  # ip-period
+                37,  # init-qp
+                24,  # qpmin
+                25,  # qpmax
+                0,  # disable-frame-skip
+                7,  # diff-qp-ip
+                21,  # diff-qp-ib
+                9,  # num-ref-frame
+                2,  # rc-mode
+                2,  # profile
+                1,  # cabac
+                0,  # dct8x8
+                0,  # deblock-filter
+                1,  # prefix-nal
+                45,  # idr-interval
+                ]
 
 
 @use_named_args(SPACE)
@@ -136,11 +252,25 @@ def objective(gop, bitrate, ip_period, init_qp, qpmin, qpmax, disable_frame_skip
                                            args=[container_ffe.logs(stream=True), utilities.PREFIX_COLOR_FFE])
         thread_logs_encoder = threading.Thread(target=utilities.log_helper, args=[container_encoder.logs(stream=True),
                                                                                   utilities.PREFIX_COLOR_ENCODER])
+        def handler(signum, frame):
+            print('Signal handler called with signal', signum)
+            container_ffe.kill()
+            container_encoder.kill()
+
+        # Setup alarm on threads, if the container does not terminate before 
+        # the CONTAINER_THREAD_TIMEOUT a kill signal is called. 
+        # Only availible on unix systems. 
+        signal.signal(signal.SIGALRM, handler)
+        signal.alarm(utilities.CONTAINER_THREAD_TIME_OUT)
+
         thread_logs_ffe.start()
         thread_logs_encoder.start()
 
         thread_logs_ffe.join()  # Blocks execution until both threads has terminated
         thread_logs_encoder.join()
+
+        # Disable the alarm
+        signal.alarm(0)       
 
     except Exception as e:
         print(e)
