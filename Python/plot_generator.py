@@ -2,10 +2,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import csv
 import os
+import utilities
 
 
 # Find files.
-def run(best_configs, output_graph_path, dataset, codec):
+def run(best_configs, dataset, codec):
 
     if len(best_configs) < 1:
         print('No best_configs passed to plot_generator.')
@@ -161,14 +162,24 @@ def run(best_configs, output_graph_path, dataset, codec):
 
         plt.xticks(np.arange(2, x_width, step=3), resolution_and_configs)
 
-        if os.path.isdir(output_graph_path):
-            plt.savefig(output_graph_path + '/' + dataset + '-' + codec + '.png')
-        else:
+        output_path = utilities.get_output_graph_path()
+
+        if not os.path.isdir(output_path):
+            os.mkdir(output_path)
+
+        try:
+            plt.savefig(output_path + '/' + dataset + '-' + codec + '.png')
+
+        except Exception as e:
             try:
-                os.mkdir(output_graph_path)
-                plt.savefig(output_graph_path + '/' + dataset + '-' + codec + '.png')
-            except Exception as e:
-                print ("Creation of the dir %s failed. Saving graph in the same folder as the script. " + e % output_graph_path)
-                plt.savefig(dataset + '-' + codec + '.png')
+                print(
+                    'Saving graph from plot_generator in ' + output_path + ' failed. '
+                    'Saving graph in the same folder as the script. \n' +
+                    'Error: ' + str(e))
+                plt.savefig(
+                    os.getcwd() + '/' + dataset + '-' + codec + '.png')
+
+            except Exception:
+                print("Failed to graph from plot_generator: " + dataset + '-' + codec)
 
     plt.clf()

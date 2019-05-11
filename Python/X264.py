@@ -185,7 +185,7 @@ def objective(gop, preset, tune, scenecut, intra_refresh, bframe, badapt, cabac,
         print('--------- TIMED OUT ---------')
         return utilities.MAX_VIOLATION
 
-    file = open(utilities.OUTPUT_REPORT_PATH + '/' + _local_variables['report_name'], 'r')  # opens report generated
+    file = open(utilities.get_output_report_path()+ '/' + _local_variables['report_name'], 'r')  # opens report generated
     plots = csv.reader(file, delimiter=';')
 
     time_violations=[]

@@ -89,7 +89,7 @@ def objective(gop, drop_frame, resize_allowed, resize_up, resize_down,
                     '--width=' + _local_variables['width'],
                     '--height=' + _local_variables['height'],
                     '--vp9',
-                    '--verbose',
+                    #'--verbose',
                     ###################
                     '--gop=' + str(gop),
                     '--threads=4',
@@ -155,7 +155,7 @@ def objective(gop, drop_frame, resize_allowed, resize_up, resize_down,
         print('--------- TIMED OUT ---------')
         return utilities.MAX_VIOLATION
 
-    file = open(utilities.OUTPUT_REPORT_PATH + '/' + _local_variables['report_name'], 'r')  # opens report generated
+    file = open(utilities.get_output_report_path() + '/' + _local_variables['report_name'], 'r')  # opens report generated
     plots = csv.reader(file, delimiter=';')
 
     time_violations=[]

@@ -21,7 +21,7 @@ def initialize(init_width='0', init_height='0', width='0', height='0', report_na
 
 def get_volumes():
     return {'/tmp/': {'bind': '/tmp', 'mode': 'rw'},
-            utilities.OUTPUT_REPORT_PATH: {'bind': '/host', 'mode': 'rw'},
+            utilities.get_output_report_path(): {'bind': '/host', 'mode': 'rw'},
             utilities.get_pngs_path(): {
                 'bind': '/pngs',
                 'mode': 'rw'}

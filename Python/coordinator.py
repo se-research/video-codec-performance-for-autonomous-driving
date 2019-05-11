@@ -99,8 +99,10 @@ if __name__ == '__main__':
     else:
         print("Following datasets are to be evaluated: " + str(datasets))
 
+    utilities.set_run_name()
     for dataset in datasets:
         utilities.set_dataset(dataset)
+        utilities.update_run_paths()
 
         for encoder in encoders:
             build()  # build FFE and encoder in case they cannot be found locally
@@ -159,10 +161,9 @@ if __name__ == '__main__':
                 ax = plot_convergence(minimize_result)
                 utilities.save_convergence(axes=ax, encoder=encoder, resolution_name=resolution_name)
 
-                utilities.save_list(best_parameters, utilities.OUTPUT_BEST_CONFIG_REPORT_PATH,
-                                    utilities.get_best_config_name())
+                utilities.save_list(best_parameters, utilities.get_best_config_name())
 
-                best_config_report_path = utilities.OUTPUT_REPORT_PATH + '/' + utilities.get_best_config_name()
+                best_config_report_path = utilities.get_output_report_path()  + '/' + utilities.get_best_config_name()
                 best_config_name = utilities.get_best_config_name()
 
                 # Only append list with configs to be plotted if they are valid
@@ -170,5 +171,4 @@ if __name__ == '__main__':
                                                    resolution_name):
                     best_configs.append([best_config_report_path, best_config_name, resolution_name])
 
-            plot_generator.run(best_configs=best_configs, output_graph_path=utilities.OUTPUT_GRAPH_PATH,
-                               dataset=utilities.get_dataset_name(), codec=encoder.TAG)
+            plot_generator.run(best_configs=best_configs, dataset=utilities.get_dataset_name(), codec=encoder.TAG)
