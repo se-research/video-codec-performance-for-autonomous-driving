@@ -69,33 +69,196 @@ SPACE = [Integer(1, 250, name='gop'),
          ]
 
 
-def get_default_encoder_config():
-    return [10,  # gop
-            'veryfast',  # preset
-            'zerolatency',  # tune
-            40,  # scenecut
-            0,  # intra_refresh
-            3,  # bframe
-            1,  # badapt
-            0,  # cabac
-            1,  # rc_mode
-            23,  # qp
-            0,  # qpmin
-            51,  # qpmax
-            4,  # qpstep
-            1500000,  # bitrate
-            23.0,  # crf
-            1.4,  # ipratio
-            1.3,  # pbratio
-            1,  # aq_mode
-            1.0,  # aq_strength
-            2,  # weightp
-            1,  # me
-            16,  # merange
-            7,  # subme
-            1,  # trellis
-            0,  # nr
-            ]
+def get_default_encoder_config(resolution):
+    if resolution == 'VGA':
+        return [149,  # gop
+                'faster',  # preset
+                'grain',  # tune
+                100,  # scenecut
+                1,  # intra_refresh
+                10,  # bframe
+                1,  # badapt
+                0,  # cabac
+                0,  # rc_mode
+                0,  # qp
+                50,  # qpmin
+                48,  # qpmax
+                6,  # qpstep
+                4198425,  # bitrate
+                33.0,  # crf
+                2.0,  # ipratio
+                1.0,  # pbratio
+                1,  # aq_mode
+                0.38862768829302097,  # aq_strength
+                1,  # weightp
+                1,  # me
+                16,  # merange
+                2,  # subme
+                1,  # trellis
+                0,  # nr
+                ]
+    elif resolution == 'SVGA':
+        return [149,  # gop
+                'faster',  # preset
+                'grain',  # tune
+                100,  # scenecut
+                1,  # intra_refresh
+                10,  # bframe
+                1,  # badapt
+                0,  # cabac
+                0,  # rc_mode
+                0,  # qp
+                50,  # qpmin
+                48,  # qpmax
+                6,  # qpstep
+                4198425,  # bitrate
+                33.0,  # crf
+                2.0,  # ipratio
+                1.0,  # pbratio
+                1,  # aq_mode
+                0.38862768829302097,  # aq_strength
+                1,  # weightp
+                1,  # me
+                16,  # merange
+                2,  # subme
+                1,  # trellis
+                0,  # nr
+                ]
+    elif resolution == 'XGA':
+        return [149,  # gop
+                'faster',  # preset
+                'grain',  # tune
+                100,  # scenecut
+                1,  # intra_refresh
+                10,  # bframe
+                1,  # badapt
+                0,  # cabac
+                0,  # rc_mode
+                0,  # qp
+                50,  # qpmin
+                48,  # qpmax
+                6,  # qpstep
+                4198425,  # bitrate
+                33.0,  # crf
+                2.0,  # ipratio
+                1.0,  # pbratio
+                1,  # aq_mode
+                0.38862768829302097,  # aq_strength
+                1,  # weightp
+                1,  # me
+                16,  # merange
+                2,  # subme
+                1,  # trellis
+                0,  # nr
+                ]
+    elif resolution == 'WXGA':
+        return [149,  # gop
+                'faster',  # preset
+                'grain',  # tune
+                100,  # scenecut
+                1,  # intra_refresh
+                10,  # bframe
+                1,  # badapt
+                0,  # cabac
+                0,  # rc_mode
+                0,  # qp
+                50,  # qpmin
+                48,  # qpmax
+                6,  # qpstep
+                4198425,  # bitrate
+                33.0,  # crf
+                2.0,  # ipratio
+                1.0,  # pbratio
+                1,  # aq_mode
+                0.38862768829302097,  # aq_strength
+                1,  # weightp
+                1,  # me
+                16,  # merange
+                2,  # subme
+                1,  # trellis
+                0,  # nr
+                ]
+    elif resolution == 'KITTY':
+        return [149,  # gop
+                'faster',  # preset
+                'grain',  # tune
+                100,  # scenecut
+                1,  # intra_refresh
+                10,  # bframe
+                1,  # badapt
+                0,  # cabac
+                0,  # rc_mode
+                0,  # qp
+                50,  # qpmin
+                48,  # qpmax
+                6,  # qpstep
+                4198425,  # bitrate
+                33.0,  # crf
+                2.0,  # ipratio
+                1.0,  # pbratio
+                1,  # aq_mode
+                0.38862768829302097,  # aq_strength
+                1,  # weightp
+                1,  # me
+                16,  # merange
+                2,  # subme
+                1,  # trellis
+                0,  # nr
+                ]
+    elif resolution == 'FHD':
+        return [149,  # gop
+                'faster',  # preset
+                'grain',  # tune
+                100,  # scenecut
+                1,  # intra_refresh
+                10,  # bframe
+                1,  # badapt
+                0,  # cabac
+                0,  # rc_mode
+                0,  # qp
+                50,  # qpmin
+                48,  # qpmax
+                6,  # qpstep
+                4198425,  # bitrate
+                33.0,  # crf
+                2.0,  # ipratio
+                1.0,  # pbratio
+                1,  # aq_mode
+                0.38862768829302097,  # aq_strength
+                1,  # weightp
+                1,  # me
+                16,  # merange
+                2,  # subme
+                1,  # trellis
+                0,  # nr
+                ]
+    elif resolution == 'QXGA':
+        return [149,  # gop
+                'faster',  # preset
+                'grain',  # tune
+                100,  # scenecut
+                1,  # intra_refresh
+                10,  # bframe
+                1,  # badapt
+                0,  # cabac
+                0,  # rc_mode
+                0,  # qp
+                50,  # qpmin
+                48,  # qpmax
+                6,  # qpstep
+                4198425,  # bitrate
+                33.0,  # crf
+                2.0,  # ipratio
+                1.0,  # pbratio
+                1,  # aq_mode
+                0.38862768829302097,  # aq_strength
+                1,  # weightp
+                1,  # me
+                16,  # merange
+                2,  # subme
+                1,  # trellis
+                0,  # nr
+                ]
 
 @use_named_args(SPACE)
 def objective(gop, preset, tune, scenecut, intra_refresh, bframe, badapt, cabac, rc_mode, qp, qpmin,

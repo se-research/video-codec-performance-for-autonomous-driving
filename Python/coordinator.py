@@ -16,7 +16,7 @@ import FFE
 width = '640'
 height = '480'
 
-N_CALLS = 100
+N_CALLS = 20
 
 config = 0
 
@@ -128,7 +128,7 @@ if __name__ == '__main__':
                                               n_random_starts=10,
                                               acq_func="gp_hedge",
                                               acq_optimizer="auto",
-                                              x0=encoder.get_default_encoder_config(),
+                                              x0=encoder.get_default_encoder_config(resolution_name),
                                               y0=None,
                                               random_state=None,
                                               verbose=True,

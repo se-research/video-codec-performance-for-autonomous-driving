@@ -58,25 +58,140 @@ SPACE = [Integer(1, 250, name='gop'),
          ]
 
 
-def get_default_encoder_config():
-    return [10,  # gop
-            2000,  # bitrate
-            0,  # ip-period
-            26,  # init-qp
-            1,  # qpmin
-            51,  # qpmax
-            0,  # disable-frame-skip
-            0,  # diff-qp-ip
-            0,  # diff-qp-ib
-            1,  # num-ref-frame
-            4,  # rc-mode
-            0,  # profile
-            0,  # cabac
-            0,  # dct8x8
-            0,  # deblock-filter
-            0,  # prefix-nal
-            1,  # idr-interval
-            ]
+def get_default_encoder_config(resolution):
+    if resolution == 'VGA':
+        return [160,  # gop
+                2868,  # bitrate
+                20,  # ip-period
+                25,  # init-qp
+                1,  # qpmin
+                25,  # qpmax
+                0,  # disable-frame-skip
+                12,  # diff-qp-ip
+                31,  # diff-qp-ib
+                10,  # num-ref-frame
+                1,  # rc-mode
+                2,  # profile
+                1,  # cabac
+                1,  # dct8x8
+                0,  # deblock-filter
+                0,  # prefix-nal
+                31,  # idr-interval
+                ]
+    elif resolution == 'SVGA':
+        return [225,  # gop
+                2253,  # bitrate
+                35,  # ip-period
+                13,  # init-qp
+                27,  # qpmin
+                41,  # qpmax
+                1,  # disable-frame-skip
+                20,  # diff-qp-ip
+                17,  # diff-qp-ib
+                11,  # num-ref-frame
+                3,  # rc-mode
+                1,  # profile
+                1,  # cabac
+                1,  # dct8x8
+                0,  # deblock-filter
+                0,  # prefix-nal
+                22,  # idr-interval
+                ]
+    elif resolution == 'XGA':
+        return [47,  # gop
+                2474,  # bitrate
+                35,  # ip-period
+                37,  # init-qp
+                24,  # qpmin
+                25,  # qpmax
+                0,  # disable-frame-skip
+                7,  # diff-qp-ip
+                21,  # diff-qp-ib
+                9,  # num-ref-frame
+                2,  # rc-mode
+                2,  # profile
+                1,  # cabac
+                0,  # dct8x8
+                0,  # deblock-filter
+                1,  # prefix-nal
+                45,  # idr-interval
+                ]
+    elif resolution == 'WXGA':
+        return [47,  # gop
+                2474,  # bitrate
+                35,  # ip-period
+                37,  # init-qp
+                24,  # qpmin
+                25,  # qpmax
+                0,  # disable-frame-skip
+                7,  # diff-qp-ip
+                21,  # diff-qp-ib
+                9,  # num-ref-frame
+                2,  # rc-mode
+                2,  # profile
+                1,  # cabac
+                0,  # dct8x8
+                0,  # deblock-filter
+                1,  # prefix-nal
+                45,  # idr-interval
+                ]
+    elif resolution == 'KITTY':
+        return [47,  # gop
+                2474,  # bitrate
+                35,  # ip-period
+                37,  # init-qp
+                24,  # qpmin
+                25,  # qpmax
+                0,  # disable-frame-skip
+                7,  # diff-qp-ip
+                21,  # diff-qp-ib
+                9,  # num-ref-frame
+                2,  # rc-mode
+                2,  # profile
+                1,  # cabac
+                0,  # dct8x8
+                0,  # deblock-filter
+                1,  # prefix-nal
+                45,  # idr-interval
+                ]
+    elif resolution == 'FHD':
+        return [47,  # gop
+                2474,  # bitrate
+                35,  # ip-period
+                37,  # init-qp
+                24,  # qpmin
+                25,  # qpmax
+                0,  # disable-frame-skip
+                7,  # diff-qp-ip
+                21,  # diff-qp-ib
+                9,  # num-ref-frame
+                2,  # rc-mode
+                2,  # profile
+                1,  # cabac
+                0,  # dct8x8
+                0,  # deblock-filter
+                1,  # prefix-nal
+                45,  # idr-interval
+                ]
+    elif resolution == 'QXGA':
+        return [47,  # gop
+                2474,  # bitrate
+                35,  # ip-period
+                37,  # init-qp
+                24,  # qpmin
+                25,  # qpmax
+                0,  # disable-frame-skip
+                7,  # diff-qp-ip
+                21,  # diff-qp-ib
+                9,  # num-ref-frame
+                2,  # rc-mode
+                2,  # profile
+                1,  # cabac
+                0,  # dct8x8
+                0,  # deblock-filter
+                1,  # prefix-nal
+                45,  # idr-interval
+                ]
 
 
 @use_named_args(SPACE)

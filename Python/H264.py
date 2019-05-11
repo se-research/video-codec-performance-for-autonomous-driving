@@ -43,7 +43,7 @@ PARAMETERS = (
 SPACE = [Integer(100000, 5000000, name='bitrate'),
          Integer(100000, 5000000, name='bitrate_max'),
          Integer(1, 250, name='gop'),
-         Integer(-1, 3, name='rc_mode'),
+         Integer(0, 4, name='rc_mode'),
          Integer(0, 2, name='ecomplexity'),
          Categorical((0, 1, 2, 3, 6), name='sps_pps_strategy'),
          Integer(1, 16, name='num_ref_frame'),
@@ -64,31 +64,168 @@ SPACE = [Integer(100000, 5000000, name='bitrate'),
          ]
 
 
-def get_default_encoder_config():
-    return [1500000,  # bitrate
-            5000000,  # max_bitrate
-            10,  # qop
-            0,  # rc_mode
-            0,  # ecomplexity
-            0,  # sps_pps_strategy
-            1,  # num_ref_frame
-            0,  # ssei
-            0,  # prefix_nal
-            0,  # entropy_coding
-            1,  # frame_skip
-            42,  # qp_max
-            12,  # qp_min
-            0,  # long_term_ref
-            0,  # loop_filter
-            0,  # denoise
-            1,  # background_detection
-            1,  # adaptive_quant
-            1,  # frame_cropping
-            1,  # scene_change_detect
-            1,  # padding
-            ]
-
-
+def get_default_encoder_config(resolution):
+    if resolution == 'VGA':
+        return [446583,  # bitrate
+                100000,  # max_bitrate
+                250,  # qop
+                0,  # rc_mode
+                0,  # ecomplexity
+                0,  # sps_pps_strategy
+                16,  # num_ref_frame
+                1,  # ssei
+                0,  # prefix_nal
+                1,  # entropy_coding
+                1,  # frame_skip
+                0,  # qp_max
+                50,  # qp_min
+                0,  # long_term_ref
+                2,  # loop_filter
+                0,  # denoise
+                0,  # background_detection
+                1,  # adaptive_quant
+                1,  # frame_cropping
+                0,  # scene_change_detect
+                1,  # padding
+                ]
+    elif resolution == 'SVGA':
+        return [4753765,  # bitrate
+                1938988,  # max_bitrate
+                144,  # qop
+                0,  # rc_mode
+                0,  # ecomplexity
+                0,  # sps_pps_strategy
+                1,  # num_ref_frame
+                0,  # ssei
+                1,  # prefix_nal
+                0,  # entropy_coding
+                1,  # frame_skip
+                41,  # qp_max
+                0,  # qp_min
+                1,  # long_term_ref
+                0,  # loop_filter
+                0,  # denoise
+                1,  # background_detection
+                1,  # adaptive_quant
+                1,  # frame_cropping
+                0,  # scene_change_detect
+                1,  # padding
+                ]
+    elif resolution == 'XGA':
+        return [5000000,  # bitrate
+                100000,  # max_bitrate
+                250,  # qop
+                0,  # rc_mode
+                0,  # ecomplexity
+                3,  # sps_pps_strategy
+                1,  # num_ref_frame
+                0,  # ssei
+                1,  # prefix_nal
+                1,  # entropy_coding
+                0,  # frame_skip
+                0,  # qp_max
+                50,  # qp_min
+                1,  # long_term_ref
+                2,  # loop_filter
+                1,  # denoise
+                0,  # background_detection
+                0,  # adaptive_quant
+                1,  # frame_cropping
+                0,  # scene_change_detect
+                0,  # padding
+                ]
+    elif resolution == 'WXGA':
+        return [100000,  # bitrate
+                100000,  # max_bitrate
+                250,  # qop
+                0,  # rc_mode
+                0,  # ecomplexity
+                1,  # sps_pps_strategy
+                1,  # num_ref_frame
+                0,  # ssei
+                1,  # prefix_nal
+                0,  # entropy_coding
+                1,  # frame_skip
+                0,  # qp_max
+                0,  # qp_min
+                0,  # long_term_ref
+                2,  # loop_filter
+                0,  # denoise
+                0,  # background_detection
+                1,  # adaptive_quant
+                0,  # frame_cropping
+                0,  # scene_change_detect
+                0,  # padding
+                ]
+    elif resolution == 'KITTY':
+        return [5000000,  # bitrate
+                194700,  # max_bitrate
+                250,  # qop
+                0,  # rc_mode
+                2,  # ecomplexity
+                2,  # sps_pps_strategy
+                1,  # num_ref_frame
+                1,  # ssei
+                1,  # prefix_nal
+                0,  # entropy_coding
+                1,  # frame_skip
+                0,  # qp_max
+                50,  # qp_min
+                1,  # long_term_ref
+                0,  # loop_filter
+                1,  # denoise
+                0,  # background_detection
+                1,  # adaptive_quant
+                0,  # frame_cropping
+                1,  # scene_change_detect
+                0,  # padding
+                ]
+    elif resolution == 'FHD':
+        return [1500000,  # bitrate
+                5000000,  # max_bitrate
+                10,  # qop
+                0,  # rc_mode
+                0,  # ecomplexity
+                0,  # sps_pps_strategy
+                1,  # num_ref_frame
+                0,  # ssei
+                0,  # prefix_nal
+                0,  # entropy_coding
+                1,  # frame_skip
+                42,  # qp_max
+                12,  # qp_min
+                0,  # long_term_ref
+                0,  # loop_filter
+                0,  # denoise
+                1,  # background_detection
+                1,  # adaptive_quant
+                1,  # frame_cropping
+                1,  # scene_change_detect
+                1,  # padding
+                ]
+    elif resolution == 'QXGA':
+        return [1778179,  # bitrate
+                2551222,  # max_bitrate
+                230,  # qop
+                2,  # rc_mode
+                0,  # ecomplexity
+                1,  # sps_pps_strategy
+                3,  # num_ref_frame
+                1,  # ssei
+                0,  # prefix_nal
+                1,  # entropy_coding
+                1,  # frame_skip
+                39,  # qp_max
+                40,  # qp_min
+                0,  # long_term_ref
+                0,  # loop_filter
+                1,  # denoise
+                0,  # background_detection
+                1,  # adaptive_quant
+                0,  # frame_cropping
+                0,  # scene_change_detect
+                1,  # padding
+                ]
 @use_named_args(SPACE)
 def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy, num_ref_frame, ssei,
               prefix_nal, entropy_coding, frame_skip, qp_max, qp_min, long_term_ref, loop_filter, denoise,

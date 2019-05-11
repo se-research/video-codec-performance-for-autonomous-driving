@@ -53,21 +53,105 @@ SPACE = [Integer(1, 250, name='gop'),
          ]
 
 
-def get_default_encoder_config():
-    return [10,  # gop
-            2000,  # bitrate
-            0,  # ip-period
-            26,  # init-qp
-            1,  # qpmin
-            51,  # qpmax
-            0,  # disable-frame-skip
-            0,  # diff-qp-ip
-            0,  # diff-qp-ib
-            1,  # num-ref-frame
-            4,  # rc-mode
-            0,  # reference-mode
-            ]
-
+def get_default_encoder_config(resolution):
+    if resolution == 'VGA':
+        return [10,  # gop
+                2000,  # bitrate
+                0,  # ip-period
+                26,  # init-qp
+                1,  # qpmin
+                51,  # qpmax
+                0,  # disable-frame-skip
+                0,  # diff-qp-ip
+                0,  # diff-qp-ib
+                1,  # num-ref-frame
+                4,  # rc-mode
+                0,  # reference-mode
+                ]
+    elif resolution == 'SVGA':
+        return [10,  # gop
+                2000,  # bitrate
+                0,  # ip-period
+                26,  # init-qp
+                1,  # qpmin
+                51,  # qpmax
+                0,  # disable-frame-skip
+                0,  # diff-qp-ip
+                0,  # diff-qp-ib
+                1,  # num-ref-frame
+                4,  # rc-mode
+                0,  # reference-mode
+                ]
+    elif resolution == 'XGA':
+        return [10,  # gop
+                2000,  # bitrate
+                0,  # ip-period
+                26,  # init-qp
+                1,  # qpmin
+                51,  # qpmax
+                0,  # disable-frame-skip
+                0,  # diff-qp-ip
+                0,  # diff-qp-ib
+                1,  # num-ref-frame
+                4,  # rc-mode
+                0,  # reference-mode
+                ]
+    elif resolution == 'WXGA':
+        return [10,  # gop
+                2000,  # bitrate
+                0,  # ip-period
+                26,  # init-qp
+                1,  # qpmin
+                51,  # qpmax
+                0,  # disable-frame-skip
+                0,  # diff-qp-ip
+                0,  # diff-qp-ib
+                1,  # num-ref-frame
+                4,  # rc-mode
+                0,  # reference-mode
+                ]
+    elif resolution == 'KITTY':
+        return [10,  # gop
+                2000,  # bitrate
+                0,  # ip-period
+                26,  # init-qp
+                1,  # qpmin
+                51,  # qpmax
+                0,  # disable-frame-skip
+                0,  # diff-qp-ip
+                0,  # diff-qp-ib
+                1,  # num-ref-frame
+                4,  # rc-mode
+                0,  # reference-mode
+                ]
+    elif resolution == 'FHD':
+        return [10,  # gop
+                2000,  # bitrate
+                0,  # ip-period
+                26,  # init-qp
+                1,  # qpmin
+                51,  # qpmax
+                0,  # disable-frame-skip
+                0,  # diff-qp-ip
+                0,  # diff-qp-ib
+                1,  # num-ref-frame
+                4,  # rc-mode
+                0,  # reference-mode
+                ]
+    elif resolution == 'QXGA':
+        return [10,  # gop
+                2000,  # bitrate
+                0,  # ip-period
+                26,  # init-qp
+                1,  # qpmin
+                51,  # qpmax
+                0,  # disable-frame-skip
+                0,  # diff-qp-ip
+                0,  # diff-qp-ib
+                1,  # num-ref-frame
+                4,  # rc-mode
+                0,  # reference-mode
+                ]
 
 @use_named_args(SPACE)
 def objective(gop, bitrate, ip_period, init_qp, qpmin, qpmax, disable_frame_skip, diff_qp_ip, diff_qp_ib,
