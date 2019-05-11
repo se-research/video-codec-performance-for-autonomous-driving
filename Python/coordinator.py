@@ -25,7 +25,6 @@ INITIAL_HEIGHT = '1536'
 
 RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']]
 
-
 def build():
     def build_ffe():
         try:

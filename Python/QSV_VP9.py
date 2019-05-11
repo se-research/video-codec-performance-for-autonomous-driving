@@ -1,6 +1,7 @@
 from skopt.space import Integer, Categorical
 from skopt.utils import use_named_args
 from statistics import mean
+import signal
 import threading
 import csv
 import utilities
@@ -121,11 +122,25 @@ def objective(gop, bitrate, ip_period, init_qp, qpmin, qpmax, disable_frame_skip
                                            args=[container_ffe.logs(stream=True), utilities.PREFIX_COLOR_FFE])
         thread_logs_encoder = threading.Thread(target=utilities.log_helper, args=[container_encoder.logs(stream=True),
                                                                                   utilities.PREFIX_COLOR_ENCODER])
+        def handler(signum, frame):
+            print('Signal handler called with signal', signum)
+            container_ffe.kill()
+            container_encoder.kill()
+
+        # Setup alarm on threads, if the container does not terminate before 
+        # the CONTAINER_THREAD_TIMEOUT a kill signal is called. 
+        # Only availible on unix systems. 
+        signal.signal(signal.SIGALRM, handler)
+        signal.alarm(utilities.CONTAINER_THREAD_TIME_OUT)
+
         thread_logs_ffe.start()
         thread_logs_encoder.start()
 
         thread_logs_ffe.join()  # Blocks execution until both threads has terminated
         thread_logs_encoder.join()
+
+        # Disable the alarm
+        signal.alarm(0)       
 
     except Exception as e:
         print(e)
