@@ -28,12 +28,11 @@ def run(encoder_list):
                     best_config = encoder.best_configs[index[0]]  # use first index item
 
                     best_configs.append(best_config)
-                    encoders_and_configs.append(encoder.encoder + '\n')
 
                     # Extract config number from best config name.
                     firstStep = best_config.best_config_name.split('.')[-2]
                     secondStep = firstStep.split('-')[-1]
-                    encoders_and_configs[i] += secondStep
+                    encoders_and_configs.append(encoder.encoder + '\n' + secondStep)
 
                     y_ssim = []
 

@@ -4,6 +4,7 @@ import sys
 import time
 from skopt import gp_minimize
 from skopt.plots import plot_convergence
+import matplotlib.pyplot as plt
 import plot_generator
 import joint_plot_generator
 import utilities
@@ -176,6 +177,8 @@ if __name__ == '__main__':
                         best_config_report_path=best_config_report_path,
                         best_config_name=best_config_name,
                         resolution_name=resolution_name))
+
+                plt.close('all')  # Cleans pyplot's memory after each iteration
 
 
             plot_generator.run(best_configs=best_configs, dataset=utilities.get_dataset_name(), codec=encoder.TAG)
