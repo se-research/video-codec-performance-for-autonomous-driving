@@ -55,46 +55,46 @@ SPACE = [Integer(1, 250, name='gop'),
 
 def get_default_encoder_config(resolution):
     if resolution == 'VGA':
-        return [10,  # gop
-                2000,  # bitrate
+        return [250,  # gop
+                5000,  # bitrate
                 0,  # ip-period
-                26,  # init-qp
-                1,  # qpmin
-                51,  # qpmax
+                51,  # init-qp
+                0,  # qpmin
+                0,  # qpmax
                 0,  # disable-frame-skip
                 0,  # diff-qp-ip
                 0,  # diff-qp-ib
-                1,  # num-ref-frame
-                4,  # rc-mode
-                0,  # reference-mode
+                16,  # num-ref-frame
+                2,  # rc-mode
+                1,  # reference-mode
                 ]
     elif resolution == 'SVGA':
-        return [10,  # gop
-                2000,  # bitrate
-                0,  # ip-period
-                26,  # init-qp
-                1,  # qpmin
+        return [149,  # gop
+                3247,  # bitrate
+                10,  # ip-period
+                2,  # init-qp
+                20,  # qpmin
                 51,  # qpmax
-                0,  # disable-frame-skip
+                1,  # disable-frame-skip
                 0,  # diff-qp-ip
-                0,  # diff-qp-ib
-                1,  # num-ref-frame
-                4,  # rc-mode
+                14,  # diff-qp-ib
+                14,  # num-ref-frame
+                1,  # rc-mode
                 0,  # reference-mode
                 ]
     elif resolution == 'XGA':
-        return [10,  # gop
-                2000,  # bitrate
-                0,  # ip-period
-                26,  # init-qp
-                1,  # qpmin
-                51,  # qpmax
+        return [109,  # gop
+                3399,  # bitrate
+                12,  # ip-period
+                20,  # init-qp
+                27,  # qpmin
+                32,  # qpmax
                 0,  # disable-frame-skip
-                0,  # diff-qp-ip
-                0,  # diff-qp-ib
+                23,  # diff-qp-ip
+                1,  # diff-qp-ib
                 1,  # num-ref-frame
-                4,  # rc-mode
-                0,  # reference-mode
+                1,  # rc-mode
+                1,  # reference-mode
                 ]
     elif resolution == 'WXGA':
         return [10,  # gop
@@ -139,18 +139,18 @@ def get_default_encoder_config(resolution):
                 0,  # reference-mode
                 ]
     elif resolution == 'QXGA':
-        return [10,  # gop
-                2000,  # bitrate
-                0,  # ip-period
-                26,  # init-qp
-                1,  # qpmin
-                51,  # qpmax
+        return [189,  # gop
+                3540,  # bitrate
+                15,  # ip-period
+                44,  # init-qp
+                29,  # qpmin
+                6,  # qpmax
                 0,  # disable-frame-skip
-                0,  # diff-qp-ip
-                0,  # diff-qp-ib
-                1,  # num-ref-frame
-                4,  # rc-mode
-                0,  # reference-mode
+                24,  # diff-qp-ip
+                19,  # diff-qp-ib
+                9,  # num-ref-frame
+                2,  # rc-mode
+                1,  # reference-mode
                 ]
 
 @use_named_args(SPACE)
