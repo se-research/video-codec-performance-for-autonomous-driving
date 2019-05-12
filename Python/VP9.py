@@ -74,7 +74,7 @@ def get_default_encoder_config(resolution):
                 1,  # kf_mode
                 0,  # kf_min_dist
                 93,  # kf_max_dist
-                0 # cpu_used
+                8 # cpu_used
                 ]
     elif resolution == 'SVGA':
         return [159,  # gop
@@ -93,7 +93,7 @@ def get_default_encoder_config(resolution):
                 1,  # kf_mode
                 1,  # kf_min_dist
                 163,  # kf_max_dist
-                0  # cpu_used
+                9  # cpu_used
                 ]
     elif resolution == 'XGA':
         return [68,  # gop
@@ -112,7 +112,7 @@ def get_default_encoder_config(resolution):
                 0,  # kf_mode
                 0,  # kf_min_dist
                 173,  # kf_max_dist
-                0  # cpu_used
+                6  # cpu_used
                 ]
     elif resolution == 'WXGA':
         return [243,  # gop
@@ -131,7 +131,7 @@ def get_default_encoder_config(resolution):
                 1,  # kf_mode
                 0,  # kf_min_dist
                 0,  # kf_max_dist
-                0  # cpu_used
+                8  # cpu_used
                 ]
     elif resolution == 'KITTY':
         return [250,  # gop
@@ -150,7 +150,7 @@ def get_default_encoder_config(resolution):
                 0,  # kf_mode
                 0,  # kf_min_dist
                 250,  # kf_max_dist
-                0  # cpu_used
+                6  # cpu_used
                 ]
     elif resolution == 'FHD':
         return [250,  # gop
@@ -169,7 +169,7 @@ def get_default_encoder_config(resolution):
                 0,  # kf_mode
                 0,  # kf_min_dist
                 250,  # kf_max_dist
-                0  # cpu_used
+                16  # cpu_used
                 ]
     elif resolution == 'QXGA':
         return [250,  # gop
@@ -188,7 +188,7 @@ def get_default_encoder_config(resolution):
                 0,  # kf_mode
                 0,  # kf_min_dist
                 250,  # kf_max_dist
-                0  # cpu_used
+                16  # cpu_used
                 ]
 
 @use_named_args(SPACE)
