@@ -31,7 +31,7 @@ TAG = 'vp9:' + VERSION
 PARAMETERS = (
     'gop', 'drop_frame', 'resize_allowed', 'resize_up', 'resize_down',
     'undershoot_pct', 'overshoot_pct', 'min_q', 'end_usage', 'buffer_size', 'buffer_init_size', 'buffer_optimal_size', 'bitrate',
-    'kf_mode', 'kf_min_dist', 'kf_max_dist'
+    'kf_mode', 'kf_min_dist', 'kf_max_dist', 'cpu_used'
 )
 
 # http://doxygen.db48x.net/mozilla/html/structvpx__codec__enc__cfg.html
@@ -51,7 +51,8 @@ SPACE = [Integer(1, 250, name='gop'),
          Integer(100000, 5000000, name='bitrate'),
          Categorical((0, 1), name='kf_mode'),
          Categorical((0, 1), name='kf_min_dist'),
-         Integer(0, 250, name='kf_max_dist')
+         Integer(0, 250, name='kf_max_dist'),
+         Integer(0, 16, name='cpu_used')
          ]
 
 
@@ -73,6 +74,7 @@ def get_default_encoder_config(resolution):
                 1,  # kf_mode
                 0,  # kf_min_dist
                 93,  # kf_max_dist
+                0 # cpu_used
                 ]
     elif resolution == 'SVGA':
         return [159,  # gop
@@ -91,6 +93,7 @@ def get_default_encoder_config(resolution):
                 1,  # kf_mode
                 1,  # kf_min_dist
                 163,  # kf_max_dist
+                0  # cpu_used
                 ]
     elif resolution == 'XGA':
         return [68,  # gop
@@ -109,6 +112,7 @@ def get_default_encoder_config(resolution):
                 0,  # kf_mode
                 0,  # kf_min_dist
                 173,  # kf_max_dist
+                0  # cpu_used
                 ]
     elif resolution == 'WXGA':
         return [243,  # gop
@@ -127,6 +131,7 @@ def get_default_encoder_config(resolution):
                 1,  # kf_mode
                 0,  # kf_min_dist
                 0,  # kf_max_dist
+                0  # cpu_used
                 ]
     elif resolution == 'KITTY':
         return [250,  # gop
@@ -145,6 +150,7 @@ def get_default_encoder_config(resolution):
                 0,  # kf_mode
                 0,  # kf_min_dist
                 250,  # kf_max_dist
+                0  # cpu_used
                 ]
     elif resolution == 'FHD':
         return [250,  # gop
@@ -163,6 +169,7 @@ def get_default_encoder_config(resolution):
                 0,  # kf_mode
                 0,  # kf_min_dist
                 250,  # kf_max_dist
+                0  # cpu_used
                 ]
     elif resolution == 'QXGA':
         return [250,  # gop
@@ -181,12 +188,13 @@ def get_default_encoder_config(resolution):
                 0,  # kf_mode
                 0,  # kf_min_dist
                 250,  # kf_max_dist
+                0  # cpu_used
                 ]
 
 @use_named_args(SPACE)
 def objective(gop, drop_frame, resize_allowed, resize_up, resize_down,
               undershoot_pct, overshoot_pct, min_q, end_usage, buffer_size, buffer_init_size,
-              buffer_optimal_size, bitrate, kf_mode, kf_min_dist, kf_max_dist):
+              buffer_optimal_size, bitrate, kf_mode, kf_min_dist, kf_max_dist, cpu_used):
 
     print(TAG)
     utilities.reset_time_out()  # resets violation variable
@@ -216,7 +224,9 @@ def objective(gop, drop_frame, resize_allowed, resize_up, resize_down,
                     '--bitrate=' + str(bitrate),
                     '--kf-mode=' + str(kf_mode),
                     '--kf-min-dist=' + str(kf_min_dist),
-                    '--kf-max-dist=' + str(kf_max_dist)
+                    '--kf-max-dist=' + str(kf_max_dist),
+                    '--cpu-used=' + str(cpu_used)
+
                     ]
 
         container_ffe = _local_variables['docker_client'].containers.run(FFE.TAG,

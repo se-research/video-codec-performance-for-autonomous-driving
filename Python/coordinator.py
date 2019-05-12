@@ -16,7 +16,7 @@ import FFE
 width = '640'
 height = '480'
 
-N_CALLS = 20
+N_CALLS = 100
 
 config = 0
 
