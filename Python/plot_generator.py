@@ -7,7 +7,6 @@ import utilities
 
 # Find files.
 def run(best_configs, dataset, codec):
-
     if len(best_configs) < 1:
         print('No best_configs passed to plot_generator.')
     else:
@@ -44,9 +43,9 @@ def run(best_configs, dataset, codec):
 
         ax.set_title(dataset + ' : [' + codec + ']')
 
-        ax.set_ylabel('ssim', color='#ee0000', fontsize = 'x-large')
-        par1.set_ylabel('size', color='#00ee00', fontsize = 'x-large')
-        par2.set_ylabel('time', color='#0000ee', fontsize = 'x-large')
+        ax.set_ylabel('ssim', color='#ee0000', fontsize='x-large')
+        par1.set_ylabel('size', color='#00ee00', fontsize='x-large')
+        par2.set_ylabel('time', color='#0000ee', fontsize='x-large')
 
         position_x = [[], [], []]
         ssim_x = 1
@@ -54,7 +53,7 @@ def run(best_configs, dataset, codec):
         time_x = 3
 
         for i, bc in enumerate(best_configs):
-            with open(bc[0], 'r') as csvfile:
+            with open(bc.best_config_report_path, 'r') as csvfile:
                 plots = csv.reader(csvfile, delimiter=';')
                 tmp_ssim = []
                 tmp_size = []
@@ -72,7 +71,7 @@ def run(best_configs, dataset, codec):
                 position_x[2].append(time_x)
                 # Do not add delimiter line on the last item.
                 if not i == (len(best_configs) - 1):
-                    ax.axvline(x = time_x + 0.5, color = '#000000')
+                    ax.axvline(x=time_x + 0.5, color='#000000')
                 ssim_x += 3
                 size_x += 3
                 time_x += 3
@@ -80,53 +79,9 @@ def run(best_configs, dataset, codec):
                 tmp_size = []
                 tmp_time = []
 
-
         ssim_boxes = ax.boxplot(y_ssim, positions=position_x[0], showfliers=False, patch_artist=True)
         size_boxes = par1.boxplot(y_size, positions=position_x[1], showfliers=False, patch_artist=True)
         time_boxes = par2.boxplot(y_time, positions=position_x[2], showfliers=False, patch_artist=True)
-
-        def colorize_boxes(boxes, color, linecolor):
-            for box in boxes['boxes']:
-                # Change outline color
-                box.set(color=color, linewidth=1, alpha=0.7)
-                # Change fill color
-                box.set(facecolor=linecolor)
-
-        def get_metrics(arr_of_arrays):
-            d = dict()
-            mins = []
-            maxes = []
-            for arr in arr_of_arrays:
-                # Fill on quartiles
-                mins.append(np.percentile(arr, 75))
-                maxes.append(np.percentile(arr, 25))
-                # Fill on whiskers.
-                # mins.append(min(arr))
-                # maxes.append(max(arr))
-            d['min'] = mins
-            d['max'] = maxes
-            return d
-
-        def get_median(boxes):
-            median_line = []
-            for medline in boxes['medians']:
-                linedata = medline.get_ydata()
-                median = linedata[0]
-                median_line.append(median)
-            return median_line
-
-        def plot_min_max_with_fill(x_positions, ax, metric_dict, median_line, color):
-            min_plot = ax.plot(x_positions, metric_dict['min'], color=color, lw=1, alpha=0.2)
-            max_plot = ax.plot(x_positions, metric_dict['max'], color=color, lw=1, alpha=0.2)
-            median_plot = ax.plot(x_positions, median_line, color='#f4a742', lw=1, alpha=0.2)
-            ax.fill_between(x_positions, metric_dict['min'], metric_dict['max'], color=color, alpha=0.1)
-
-            d = dict()
-            d['min_plot'] = min_plot
-            d['max_plot'] = max_plot
-            d['median_plot'] = median_plot
-
-            return d
 
         # Fill with colors.
         colorize_boxes(ssim_boxes, '#cc0000', '#aa0000')
@@ -152,11 +107,11 @@ def run(best_configs, dataset, codec):
 
         resolution_and_configs = []
         for bc in best_configs:
-            resolution_and_configs.append(bc[2] + '\n')
+            resolution_and_configs.append(bc.resolution_name + '\n')
 
         # Extract config number from best config name.
         for i, bc in enumerate(best_configs):
-            firstStep = bc[1].split('.')[-2]
+            firstStep = bc.best_config_name.split('.')[-2]
             secondStep = firstStep.split('-')[-1]
             resolution_and_configs[i] += secondStep
 
@@ -183,3 +138,50 @@ def run(best_configs, dataset, codec):
                 print("Failed to graph from plot_generator: " + dataset + '-' + codec)
 
     plt.clf()
+
+
+def colorize_boxes(boxes, color, linecolor):
+    for box in boxes['boxes']:
+        # Change outline color
+        box.set(color=color, linewidth=1, alpha=0.7)
+        # Change fill color
+        box.set(facecolor=linecolor)
+
+
+def get_metrics(arr_of_arrays):
+    d = dict()
+    mins = []
+    maxes = []
+    for arr in arr_of_arrays:
+        # Fill on quartiles
+        mins.append(np.percentile(arr, 75))
+        maxes.append(np.percentile(arr, 25))
+        # Fill on whiskers.
+        # mins.append(min(arr))
+        # maxes.append(max(arr))
+    d['min'] = mins
+    d['max'] = maxes
+    return d
+
+
+def get_median(boxes):
+    median_line = []
+    for medline in boxes['medians']:
+        linedata = medline.get_ydata()
+        median = linedata[0]
+        median_line.append(median)
+    return median_line
+
+
+def plot_min_max_with_fill(x_positions, ax, metric_dict, median_line, color):
+    min_plot = ax.plot(x_positions, metric_dict['min'], color=color, lw=1, alpha=0.2)
+    max_plot = ax.plot(x_positions, metric_dict['max'], color=color, lw=1, alpha=0.2)
+    median_plot = ax.plot(x_positions, median_line, color='#f4a742', lw=1, alpha=0.2)
+    ax.fill_between(x_positions, metric_dict['min'], metric_dict['max'], color=color, alpha=0.1)
+
+    d = dict()
+    d['min_plot'] = min_plot
+    d['max_plot'] = max_plot
+    d['median_plot'] = median_plot
+
+    return d

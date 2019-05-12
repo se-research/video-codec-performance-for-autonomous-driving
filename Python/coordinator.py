@@ -5,6 +5,7 @@ import time
 from skopt import gp_minimize
 from skopt.plots import plot_convergence
 import plot_generator
+import joint_plot_generator
 import utilities
 import QSV_H264
 import QSV_VP9
@@ -16,14 +17,13 @@ import FFE
 width = '640'
 height = '480'
 
-N_CALLS = 100
+N_CALLS = 11
 
 config = 0
 
 INITIAL_WIDTH = '2048'
 INITIAL_HEIGHT = '1536'
 
-RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']]
 
 def build():
     def build_ffe():
@@ -89,7 +89,7 @@ def update_report_name_callback(_):
 if __name__ == '__main__':
     docker_client = docker.from_env()
 
-    encoders = [VP9, QSV_H264, X264, H264] #QSV_VP9 not avail on Brick
+    encoders = [H264, VP9, QSV_VP9, QSV_H264] # QSV_VP9 not avail on Brick, FFE fails on encode on X264
 
     datasets = utilities.get_datasets()
     if not datasets:
@@ -99,16 +99,20 @@ if __name__ == '__main__':
         print("Following datasets are to be evaluated: " + str(datasets))
 
     utilities.set_run_name()
+
     for dataset in datasets:
         utilities.set_dataset(dataset)
         utilities.update_run_paths()
+
+        joint_plot_encoders = []
+
 
         for encoder in encoders:
             build()  # build FFE and encoder in case they cannot be found locally
 
             best_configs = []
 
-            for (_, res) in enumerate(RESOLUTIONS):
+            for (_, res) in enumerate(utilities.RESOLUTIONS):
                 resolution_name = res[0]
                 width = res[1]
                 height = res[2]
@@ -162,12 +166,25 @@ if __name__ == '__main__':
 
                 utilities.save_list(best_parameters, utilities.get_best_config_name())
 
-                best_config_report_path = utilities.get_output_report_path()  + '/' + utilities.get_best_config_name()
+                best_config_report_path = utilities.get_output_report_path() + '/' + utilities.get_best_config_name()
                 best_config_name = utilities.get_best_config_name()
 
                 # Only append list with configs to be plotted if they are valid
-                if utilities.check_config_and_path(best_config_report_path, best_config_name , encoder.TAG,
+                if utilities.check_config_and_path(best_config_report_path, best_config_name, encoder.TAG,
                                                    resolution_name):
-                    best_configs.append([best_config_report_path, best_config_name, resolution_name])
+                    best_configs.append(utilities.BestConfig(
+                        best_config_report_path=best_config_report_path,
+                        best_config_name=best_config_name,
+                        resolution_name=resolution_name))
+
 
             plot_generator.run(best_configs=best_configs, dataset=utilities.get_dataset_name(), codec=encoder.TAG)
+
+            # Add an Encoder object after each encoders' full execution on a dataset
+            joint_plot_encoders.append(utilities.Encoder(
+                best_configs=best_configs,
+                encoder=encoder.TAG,
+                dataset_name=utilities.get_dataset_name()))
+
+        joint_plot_generator.run(joint_plot_encoders)
+

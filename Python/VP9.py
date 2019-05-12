@@ -226,7 +226,6 @@ def objective(gop, drop_frame, resize_allowed, resize_up, resize_down,
                     '--kf-min-dist=' + str(kf_min_dist),
                     '--kf-max-dist=' + str(kf_max_dist),
                     '--cpu-used=' + str(cpu_used)
-
                     ]
 
         container_ffe = _local_variables['docker_client'].containers.run(FFE.TAG,

@@ -18,10 +18,11 @@ dataset = 'not_set'
 DATASETS_PATH = os.path.join(os.getcwd(), '../datasets')
 OUTPUT_PATH = os.path.join(os.getcwd(), '../output')
 
-OUTPUT_REPORT_PATH = os.path.join(os.getcwd(), '..output/not_set/reports')
-OUTPUT_CONVERGENCE_PATH = os.path.join(os.getcwd(), '..output/not_set/convergence')
-OUTPUT_GRAPH_PATH = os.path.join(os.getcwd(), '..output/not_set/graphs')
-OUTPUT_BEST_CONFIG_REPORT_PATH = os.path.join(os.getcwd(), '..output/not_set/best_config_report')
+OUTPUT_REPORT_PATH = os.path.join(os.getcwd(), '../output/not_set/reports')
+OUTPUT_CONVERGENCE_PATH = os.path.join(os.getcwd(), '../output/not_set/convergence')
+OUTPUT_GRAPH_PATH = os.path.join(os.getcwd(), '../output/not_set/graphs')
+OUTPUT_BEST_CONFIG_REPORT_PATH = os.path.join(os.getcwd(), '../output/not_set/best_config_report')
+OUTPUT_JOINT_GRAPH_PATH = os.path.join(os.getcwd(), '../output/not_set/joint_graphs')
 
 PREFIX_COLOR_FFE = '92'
 PREFIX_COLOR_ENCODER = '94'
@@ -31,6 +32,8 @@ best_config_name = 'not_set'
 time_out = False
 
 MAX_VIOLATION = 2.5
+
+RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']]
 
 run_name = 'not_set'
 
@@ -176,6 +179,10 @@ def get_output_graph_path():
     return OUTPUT_GRAPH_PATH
 
 
+def get_joint_output_graph_path():
+    return OUTPUT_JOINT_GRAPH_PATH
+
+
 def get_dataset_name():
     return dataset
 
@@ -219,6 +226,7 @@ def update_run_paths():
     global OUTPUT_CONVERGENCE_PATH
     global OUTPUT_GRAPH_PATH
     global OUTPUT_BEST_CONFIG_REPORT_PATH
+    global OUTPUT_JOINT_GRAPH_PATH
 
     OUTPUT_REPORT_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name()
                                       + '/reports')
@@ -227,7 +235,22 @@ def update_run_paths():
     OUTPUT_GRAPH_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name() + '/graphs')
     OUTPUT_BEST_CONFIG_REPORT_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name()
                                                   + '/best_config_report')
+    OUTPUT_JOINT_GRAPH_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name() + '/joint_graphs')
 
 
 def get_run_name():
     return run_name
+
+
+class BestConfig:
+    def __init__(self, best_config_report_path, best_config_name, resolution_name):
+        self.best_config_report_path = best_config_report_path
+        self.best_config_name = best_config_name
+        self.resolution_name = resolution_name
+
+
+class Encoder:
+    def __init__(self, best_configs, encoder, dataset_name):
+        self.best_configs = best_configs
+        self.encoder = encoder
+        self.dataset_name = dataset_name
