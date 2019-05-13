@@ -2,6 +2,7 @@ import os
 import matplotlib.pyplot as plt
 import socket
 from datetime import datetime
+from math import ceil
 
 CID = '112'
 SHARED_MEMORY_AREA = 'video1'
@@ -10,7 +11,9 @@ STOP_AFTER = 80
 TIMED_OUT_MSG_BYTES = str.encode('[frame-feed-evaluator]: Timed out while waiting for encoded frame.\n')
 TIMED_OUT = False
 
-CONTAINER_THREAD_TIME_OUT = 3600
+system_timeout = 0
+DELAY_START = 1000
+TIMEOUT = 100
 
 pngs_path = 'not_set'
 dataset = 'not_set'
@@ -37,6 +40,28 @@ RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '7
 
 run_name = 'not_set'
 
+
+def set_system_timeout(dataset):
+    global system_timeout
+    dir = DATASETS_PATH + '/' + dataset
+    onlyfiles = next(os.walk(dir))[2]
+
+    # number of files in dir
+    onlyfiles = len(onlyfiles)
+
+    # multiply the frames with the timeout (total max duration for the frame compression) + *2 for some leeway
+    onlyfiles *= (TIMEOUT * 2)
+
+    # add delay_start
+    onlyfiles += DELAY_START
+
+    system_timeout = onlyfiles/1000 # convert to seconds
+
+    system_timeout = int(ceil(system_timeout))  # round-up and convert to int
+
+
+def get_system_timeout():
+    return system_timeout
 
 # Returns folders in datasets directory
 def get_datasets():

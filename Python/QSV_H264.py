@@ -261,7 +261,7 @@ def objective(gop, bitrate, ip_period, init_qp, qpmin, qpmax, disable_frame_skip
         # the CONTAINER_THREAD_TIMEOUT a kill signal is called. 
         # Only availible on unix systems. 
         signal.signal(signal.SIGALRM, handler)
-        signal.alarm(utilities.CONTAINER_THREAD_TIME_OUT)
+        signal.alarm(utilities.get_system_timeout())
 
         thread_logs_ffe.start()
         thread_logs_encoder.start()
