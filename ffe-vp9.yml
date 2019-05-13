@@ -18,18 +18,18 @@ services:
     frame-feed-evaluator:
         container_name: ffe
         build:
-            context: https://github.com/chrberger/frame-feed-evaluator.git#v0.0.3
+            context: https://github.com/chrberger/frame-feed-evaluator.git#v0.0.4
             dockerfile: Dockerfile.amd64
         network_mode: "host"
         ipc: "host"
         volumes:
         - /tmp:/tmp
         - $PWD:/host
-        - $PWD/example:/pngs
+        - $PWD/datasets/example:/pngs
         working_dir: /host
         environment:
         - DISPLAY=$DISPLAY
-        command: "--folder=/pngs --report=ffe-vp9.csv --cid=111 --name=video0 --crop.x=376 --crop.y=32 --crop.width=640 --crop.height=480 --delay=0 --timeout=1000"
+        command: "--folder=/pngs --report=ffe-vp9.csv --cid=111 --name=video0 --crop.x=376 --crop.y=32 --crop.width=640 --crop.height=480 --delay=0 --noexitontimeout"
 
     video-vp8-encoder-amd64:
         container_name: vp9
@@ -42,4 +42,4 @@ services:
         ipc: "host"
         volumes:
         - /tmp:/tmp
-        command: "--cid=111 --name=video0 --width=640 --height=480 --vp9 --bitrate=100000 --verbose"
+        command: "--cid=111 --name=video0 --width=640 --height=480 --vp9"
