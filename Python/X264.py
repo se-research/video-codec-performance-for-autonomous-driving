@@ -374,6 +374,11 @@ def objective(gop, preset, tune, scenecut, intra_refresh, bframe, badapt, cabac,
         if time > 40000:  # scales violation time up to 250 % (2.5) violation
             time_violations.append(time)
 
+    # return MAX_VIOLATION if dropped frames are more than MAX_DROPPED_FRAMES
+    if len(ssim) / (utilities.get_dataset_lenght() - 1) < utilities.MAX_DROPPED_FRAMES:
+        print('--------- DROPPED FRAMES EXCEEDED MAX_DROPPED_FRAMES ---------')
+        return utilities.MAX_VIOLATION
+
     if time_violations:  # if the list is not empty
         return mean(time_violations) / 40000
 

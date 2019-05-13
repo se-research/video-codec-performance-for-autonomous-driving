@@ -26,8 +26,8 @@ def initialize(init_width='0', init_height='0', resolution=['VGA', '640', '480']
     _local_variables['report_name'] = report_name
 
 REPO = 'https://github.com/guslauer/video-qsv-vp9-encoder.git'
-VERSION = 'latest'  # @TODO change
-TAG = 'qsv-vp9:' + VERSION # @TODO change
+VERSION = 'v0.0.1'
+TAG = 'qsv-vp9:' + VERSION
 
 PARAMETERS = (
     'gop', 'bitrate', 'ip-period', 'init-qp', 'qpmin', 'qpmax', 'disable-frame-skip', 'diff-qp-ip', 'diff-qp-ib',
@@ -252,6 +252,11 @@ def objective(gop, bitrate, ip_period, init_qp, qpmin, qpmax, disable_frame_skip
         time = float(row[12])
         if time > 40000:  # scales violation time up to 250 % (2.5) violation
             time_violations.append(time)
+
+    # return MAX_VIOLATION if dropped frames are more than MAX_DROPPED_FRAMES
+    if len(ssim) / (utilities.get_dataset_lenght() - 1) < utilities.MAX_DROPPED_FRAMES:
+        print('--------- DROPPED FRAMES EXCEEDED MAX_DROPPED_FRAMES ---------')
+        return utilities.MAX_VIOLATION
 
     if time_violations:  # if the list is not empty
         return mean(time_violations) / 40000

@@ -6,7 +6,6 @@ import threading
 import csv
 import utilities
 import FFE
-from time import sleep
 
 _local_variables = {}
 
@@ -307,7 +306,7 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
         thread_logs_encoder.join()
 
         # Disable the alarm
-        signal.alarm(0)       
+        signal.alarm(0)
 
     except Exception as e:
         print(e)
@@ -320,7 +319,8 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
             print(e)
             return utilities.MAX_VIOLATION
 
-    if utilities.get_time_out():  # FFE timed out due to compression time constraint violated
+    # FFE timed out due to compression time constraint violated
+    if utilities.get_time_out():
         print('--------- TIMED OUT ---------')
         return utilities.MAX_VIOLATION
 
@@ -335,6 +335,11 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
         time = float(row[12])
         if time > 40000:  # scales violation time up to 250 % (2.5) violation
             time_violations.append(time)
+
+    # return MAX_VIOLATION if dropped frames are more than MAX_DROPPED_FRAMES
+    if len(ssim) / (utilities.get_dataset_lenght() - 1) < utilities.MAX_DROPPED_FRAMES:
+        print('--------- DROPPED FRAMES EXCEEDED MAX_DROPPED_FRAMES ---------')
+        return utilities.MAX_VIOLATION
 
     if time_violations:  # if the list is not empty
         return mean(time_violations) / 40000
