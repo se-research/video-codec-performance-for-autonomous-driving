@@ -18,7 +18,7 @@ import FFE
 width = '640'
 height = '480'
 
-N_CALLS = 11
+N_CALLS = 25
 
 config = 0
 
@@ -114,6 +114,8 @@ if __name__ == '__main__':
             best_configs = []
 
             for (_, res) in enumerate(utilities.RESOLUTIONS):
+                plt.close('all')  # Cleans pyplot's memory before each iteration
+
                 resolution_name = res[0]
                 width = res[1]
                 height = res[2]
@@ -178,9 +180,7 @@ if __name__ == '__main__':
                         best_config_name=best_config_name,
                         resolution_name=resolution_name))
 
-                plt.close('all')  # Cleans pyplot's memory after each iteration
-
-
+            # Runs the plot_generator script to generate a performance graph of the current encoder and all resolutions
             plot_generator.run(best_configs=best_configs, dataset=utilities.get_dataset_name(), codec=encoder.TAG)
 
             # Add an Encoder object after each encoders' full execution on a dataset
@@ -189,5 +189,6 @@ if __name__ == '__main__':
                 encoder=encoder.TAG,
                 dataset_name=utilities.get_dataset_name()))
 
+        # Runs the joint_plot_generator script to generate a comparision graph of respective encoder's SSIM per res
         joint_plot_generator.run(joint_plot_encoders)
 

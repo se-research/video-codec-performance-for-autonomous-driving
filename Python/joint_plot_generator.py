@@ -41,7 +41,7 @@ def run(encoder_list):
                     ax.autoscale_view(scalex=True)
 
                     ax.tick_params(axis='y', colors='#ee0000')
-                    ax.set_ylim(top=1, bottom=0)
+                    #ax.set_ylim(top=1, bottom=0)
 
                     ax.set_title(dataset + ' : [' + resolution + ']')
 
