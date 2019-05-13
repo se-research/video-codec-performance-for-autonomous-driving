@@ -57,17 +57,14 @@ def set_system_timeout(dataset):
     # number of files in dir
     dataset_length = len(onlyfiles) # set dataset_length to number of frames
     system_timeout = dataset_length
-
-    # multiply the frames with the timeout (total max duration for the frame compression) + *2 for some leeway
-    system_timeout *= (TIMEOUT * 2)
-
+    # multiply the frames with the timeout (total max duration for the frame compression)
+    system_timeout *= (TIMEOUT)
     # add delay_start
     system_timeout += DELAY_START
-
     system_timeout = system_timeout/1000 # convert to seconds
 
-    system_timeout = int(ceil(system_timeout))  # round-up and convert to int
-
+    # round-up and convert to int  + *2 for some leeway
+    system_timeout = int(ceil(system_timeout)) * 2  
 
 def get_system_timeout():
     return system_timeout
