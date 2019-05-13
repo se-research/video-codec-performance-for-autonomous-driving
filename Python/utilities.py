@@ -13,7 +13,8 @@ TIMED_OUT = False
 
 system_timeout = 0
 DELAY_START = 1000
-TIMEOUT = 100
+TIMEOUT = 60
+START_UP = 30
 MAX_DROPPED_FRAMES = 0.95 # in %
 
 pngs_path = 'not_set'
@@ -35,7 +36,7 @@ max_ssim = 0
 best_config_name = 'not_set'
 time_out = False
 
-MAX_VIOLATION = 2.5
+MAX_VIOLATION = 1.5
 
 RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']]
 
@@ -64,7 +65,10 @@ def set_system_timeout(dataset):
     system_timeout = system_timeout/1000 # convert to seconds
 
     # round-up and convert to int  + *2 for some leeway
-    system_timeout = int(ceil(system_timeout)) * 2  
+    system_timeout = int(ceil(system_timeout)) * 2 
+    system_timeout += START_UP
+    print('dataset length: ' + str(dataset_length))
+    print('system timeout: ' + str(system_timeout)) 
 
 def get_system_timeout():
     return system_timeout
