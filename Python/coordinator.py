@@ -18,7 +18,7 @@ import FFE
 width = '640'
 height = '480'
 
-N_CALLS = 20
+N_CALLS = 100
 
 config = 0
 
@@ -90,7 +90,7 @@ def update_report_name_callback(_):
 if __name__ == '__main__':
     docker_client = docker.from_env()
 
-    encoders = [VP9, H264, QSV_H264] # QSV_VP9 not avail on Brick, FFE fails on encode on X264
+    encoders = [VP9, H264, QSV_H264, QSV_VP9] # QSV_VP9 not avail on Brick, FFE fails on encode on X264
 
     datasets = utilities.get_datasets()
     if not datasets:
