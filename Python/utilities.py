@@ -43,7 +43,7 @@ RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '7
 run_name = 'not_set'
 
 dataset_length = 0
-
+            
 
 def get_dataset_lenght():
     return dataset_length
@@ -75,7 +75,18 @@ def get_system_timeout():
 
 # Returns folders in datasets directory
 def get_datasets():
-    return os.listdir(DATASETS_PATH)
+    datasets = os.listdir(DATASETS_PATH)
+    valid_sets = []
+    for dataset in datasets:
+        files = next(os.walk(DATASETS_PATH + '/' + dataset))[2]
+        is_set_valid = True
+        for f in files:
+            if not f[-4:] == '.png':
+                is_set_valid = False
+                print('A non-png file in: ' + str(dataset) + '. This might be an auto generated folder.')
+        if is_set_valid:
+            valid_sets.append(dataset)
+    return valid_sets
 
 
 # Returns the report_name in correct format
