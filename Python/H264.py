@@ -336,8 +336,10 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
         if time > 40000:    # if compression time is more than the allowed 40 ms
             time_violations.append(time)
 
+    frames = len(ssim) + 1 # to account for the one frame that some encoders do not encode
+
     # return MAX_VIOLATION if dropped frames are more than MAX_DROPPED_FRAMES
-    if len(ssim) / (utilities.get_dataset_lenght() - 1) < utilities.MAX_DROPPED_FRAMES:
+    if frames / (utilities.get_dataset_lenght()) < utilities.MAX_DROPPED_FRAMES:
         print('--------- DROPPED FRAMES EXCEEDED MAX_DROPPED_FRAMES ---------')
         return utilities.MAX_VIOLATION
 

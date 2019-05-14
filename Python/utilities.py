@@ -15,7 +15,7 @@ system_timeout = 0
 DELAY_START = 1000
 TIMEOUT = 60
 START_UP = 30
-MAX_DROPPED_FRAMES = 0.95 # in %
+MAX_DROPPED_FRAMES = 0.99 # in %
 
 pngs_path = 'not_set'
 dataset = 'not_set'

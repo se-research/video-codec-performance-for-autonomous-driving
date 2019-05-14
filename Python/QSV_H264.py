@@ -302,13 +302,15 @@ def objective(gop, bitrate, ip_period, init_qp, qpmin, qpmax, disable_frame_skip
         if time > 40000:  # if compression time is more than the allowed 40 ms
             time_violations.append(time)
 
+    frames = len(ssim) + 1 # to account for the one frame that some encoders do not encode
+
     # return MAX_VIOLATION if dropped frames are more than MAX_DROPPED_FRAMES
-    if len(ssim) / (utilities.get_dataset_lenght() - 1) < utilities.MAX_DROPPED_FRAMES:
+    if frames / (utilities.get_dataset_lenght()) < utilities.MAX_DROPPED_FRAMES:
         print('--------- DROPPED FRAMES EXCEEDED MAX_DROPPED_FRAMES ---------')
         return utilities.MAX_VIOLATION
 
     if time_violations:  # if the list is not empty
-        return mean(time_violations) / 40000  # returns mean of violation time (between 1 and MAX_VIOLATION)
+        return mean(time_violations) / 40000 # returns mean of violation time (between 1 and MAX_VIOLATION)
 
     if not ssim:  # if the list is empty
         print('--------- EMPTY FILE ---------')
