@@ -324,16 +324,16 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
         print('--------- TIMED OUT ---------')
         return utilities.MAX_VIOLATION
 
-    file = open(utilities.get_output_report_path() + '/' + _local_variables['report_name'], 'r')  # opens report generated
-    plots = csv.reader(file, delimiter=';')
+    file = open(utilities.get_output_report_path() + '/' + _local_variables['report_name'], 'r')  # opens generated report
+    report_file = csv.reader(file, delimiter=';')
 
     time_violations=[]
     ssim =[]
-    for row in plots:
-        ssim.append(float(row[10]))  # accomulate values in SSIM column
+    for row in report_file:
+        ssim.append(float(row[10]))  # accomulate values in SSIM column in csv
+        time = float(row[12])   # extract compression time from csv
 
-        time = float(row[12])
-        if time > 40000:  # scales violation time up to 250 % (2.5) violation
+        if time > 40000:    # if compression time is more than the allowed 40 ms
             time_violations.append(time)
 
     # return MAX_VIOLATION if dropped frames are more than MAX_DROPPED_FRAMES
@@ -342,7 +342,7 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
         return utilities.MAX_VIOLATION
 
     if time_violations:  # if the list is not empty
-        return mean(time_violations) / 40000
+        return mean(time_violations) / 40000 # returns mean of violation time (between 1 and MAX_VIOLATION)
 
     if not ssim:  # if the list is empty
         print('--------- EMPTY FILE ---------')

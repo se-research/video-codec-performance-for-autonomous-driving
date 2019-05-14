@@ -49,26 +49,34 @@ def get_dataset_lenght():
     return dataset_length
 
 
-def set_system_timeout(dataset):
-    global system_timeout
+def set_dataset_length(dataset):
     global dataset_length
     dir = DATASETS_PATH + '/' + dataset
     onlyfiles = next(os.walk(dir))[2]
 
     # number of files in dir
-    dataset_length = len(onlyfiles) # set dataset_length to number of frames
+    dataset_length = len(onlyfiles)  # set dataset_length to number of frames
+    set_system_timeout(dataset_length)
+
+
+def set_system_timeout(dataset_length):
+    global system_timeout
+
     system_timeout = dataset_length
+
     # multiply the frames with the timeout (total max duration for the frame compression)
     system_timeout *= (TIMEOUT)
+
     # add delay_start
     system_timeout += DELAY_START
-    system_timeout = system_timeout/1000 # convert to seconds
+    system_timeout = system_timeout/1000  # convert to seconds
 
     # round-up and convert to int  + *2 for some leeway
     system_timeout = int(ceil(system_timeout)) * 2 
+
+    # add start-up time to the timeout
     system_timeout += START_UP
-    print('dataset length: ' + str(dataset_length))
-    print('system timeout: ' + str(system_timeout)) 
+
 
 def get_system_timeout():
     return system_timeout
