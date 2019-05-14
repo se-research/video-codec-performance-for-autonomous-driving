@@ -18,12 +18,9 @@ import FFE
 width = '640'
 height = '480'
 
-N_CALLS = 11
+N_CALLS = 100
 
 config = 0
-
-INITIAL_WIDTH = '2048'
-INITIAL_HEIGHT = '1536'
 
 
 def build():
@@ -113,7 +110,17 @@ if __name__ == '__main__':
 
             best_configs = []
 
-            for (_, res) in enumerate(utilities.RESOLUTIONS):
+            if utilities.get_kitti_res_flag():  # if KITTI res is detected, evaluate only the KITTI res
+                resolutions = [['KITTI', '1392', '512']]
+                INITIAL_HEIGHT = '512'
+                INITIAL_WIDTH = '1392'
+
+            else:
+                resolutions = utilities.RESOLUTIONS
+                INITIAL_WIDTH = '2048'
+                INITIAL_HEIGHT = '1536'
+
+            for res in resolutions:
                 plt.close('all')  # Cleans pyplot's memory before each iteration
 
                 resolution_name = res[0]
@@ -126,7 +133,7 @@ if __name__ == '__main__':
                                    docker_client=docker_client)
                 FFE.initialize(init_width=INITIAL_WIDTH, init_height=INITIAL_HEIGHT, width=width, height=height)
 
-                update_report_name_callback(_)
+                update_report_name_callback('')
 
                 start = time.time()
 
@@ -180,15 +187,17 @@ if __name__ == '__main__':
                         best_config_name=best_config_name,
                         resolution_name=resolution_name))
 
-            # Runs the plot_generator script to generate a performance graph of the current encoder and all resolutions
-            plot_generator.run(best_configs=best_configs, dataset=utilities.get_dataset_name(), codec=encoder.TAG)
+            if not utilities.get_kitti_res_flag():
+                # Runs the plot_generator script to generate a performance graph of the current encoder and all resolutions
+                plot_generator.run(best_configs=best_configs, dataset=utilities.get_dataset_name(), codec=encoder.TAG)
 
-            # Add an Encoder object after each encoders' full execution on a dataset
-            joint_plot_encoders.append(utilities.Encoder(
-                best_configs=best_configs,
-                encoder=encoder.TAG,
-                dataset_name=utilities.get_dataset_name()))
+                # Add an Encoder object after each encoders' full execution on a dataset
+                joint_plot_encoders.append(utilities.Encoder(
+                    best_configs=best_configs,
+                    encoder=encoder.TAG,
+                    dataset_name=utilities.get_dataset_name()))
 
-        # Runs the joint_plot_generator script to generate a comparision graph of respective encoder's SSIM per res
-        joint_plot_generator.run(joint_plot_encoders)
+        if not utilities.get_kitti_res_flag():
+            # Runs the joint_plot_generator script to generate a comparision graph of respective encoder's SSIM per res
+            joint_plot_generator.run(joint_plot_encoders)
 

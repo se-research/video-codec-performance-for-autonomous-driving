@@ -178,7 +178,7 @@ def get_default_encoder_config(resolution):
                 1,  # trellis
                 0,  # nr
                 ]
-    elif resolution == 'KITTY':
+    elif resolution == 'KITTI':
         return [149,  # gop
                 'faster',  # preset
                 'grain',  # tune
@@ -265,7 +265,7 @@ def objective(gop, preset, tune, scenecut, intra_refresh, bframe, badapt, cabac,
     qpmax, qpstep, bitrate, crf, ipratio, pbratio, aq_mode, aq_strength, weightp, me, merange,
     subme, trellis, nr):
 
-    print(TAG)
+    print('Using ' + TAG + ' to encode ' + utilities.get_dataset_name())
     utilities.reset_time_out()  # resets violation variable
 
     try:  # try/catch to catch when the containers crash due to illegal parameter combination

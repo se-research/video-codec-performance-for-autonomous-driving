@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import socket
 from datetime import datetime
 from math import ceil
+import image_size.get_image_size as image_size
 
 CID = '112'
 SHARED_MEMORY_AREA = 'video1'
@@ -43,7 +44,7 @@ RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '7
 run_name = 'not_set'
 
 dataset_length = 0
-            
+kitti_res = False
 
 def get_dataset_lenght():
     return dataset_length
@@ -213,8 +214,22 @@ def get_best_config_name():
 def set_dataset(name):
     global pngs_path
     global dataset
+    global kitti_res
+
     dataset = name
     pngs_path = os.path.join(os.getcwd(), '../datasets/' + name)
+
+    files = next(os.walk(pngs_path))[2]
+
+    kitti_res = False   # set to false for each iteration
+    if image_size.get_image_size(DATASETS_PATH + '/' + dataset + '/' + files[0]) == (1392, 512):
+        print('Dataset with KITTI resolution detected. The script will only evaluate the dataset in its '
+              'original resolution (1392x512)')
+        kitti_res = True    # the first file in the dataset is of KITTI res (assume all are that res)
+
+
+def get_kitti_res_flag():
+    return kitti_res
 
 
 def get_pngs_path():

@@ -133,7 +133,7 @@ def get_default_encoder_config(resolution):
                 0,  # kf_max_dist
                 8  # cpu_used
                 ]
-    elif resolution == 'KITTY':
+    elif resolution == 'KITTI':
         return [250,  # gop
                 0,  # drop_frame
                 0,  # resize_allowed
@@ -196,7 +196,7 @@ def objective(gop, drop_frame, resize_allowed, resize_up, resize_down,
               undershoot_pct, overshoot_pct, min_q, end_usage, buffer_size, buffer_init_size,
               buffer_optimal_size, bitrate, kf_mode, kf_min_dist, kf_max_dist, cpu_used):
 
-    print(TAG)
+    print('Using ' + TAG + ' to encode ' + utilities.get_dataset_name())
     utilities.reset_time_out()  # resets violation variable
 
     try:  # try/catch to catch when the containers crash due to illegal parameter combination

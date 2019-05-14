@@ -135,7 +135,7 @@ def get_default_encoder_config(resolution):
                 1,  # prefix-nal
                 45,  # idr-interval
                 ]
-    elif resolution == 'KITTY':
+    elif resolution == 'KITTI':
         return [47,  # gop
                 2474,  # bitrate
                 35,  # ip-period
@@ -198,7 +198,7 @@ def get_default_encoder_config(resolution):
 def objective(gop, bitrate, ip_period, init_qp, qpmin, qpmax, disable_frame_skip, diff_qp_ip, diff_qp_ib,
               num_ref_frame, rc_mode, profile, cabac, dct8x8, deblock_filter, prefix_nal, idr_interval):
 
-    print(TAG)
+    print('Using ' + TAG + ' to encode ' + utilities.get_dataset_name())
     utilities.reset_time_out()  # resets violation variable
 
     try:  # try/catch to catch when the containers crash due to illegal parameter combination

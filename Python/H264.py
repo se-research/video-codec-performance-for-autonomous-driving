@@ -156,7 +156,7 @@ def get_default_encoder_config(resolution):
                 0,  # scene_change_detect
                 0,  # padding
                 ]
-    elif resolution == 'KITTY':
+    elif resolution == 'KITTI':
         return [5000000,  # bitrate
                 194700,  # max_bitrate
                 250,  # qop
@@ -230,7 +230,7 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
               prefix_nal, entropy_coding, frame_skip, qp_max, qp_min, long_term_ref, loop_filter, denoise,
               background_detection, adaptive_quant, frame_cropping, scene_change_detect, padding):
 
-    print(TAG)
+    print('Using ' + TAG + ' to encode ' + utilities.get_dataset_name())
     utilities.reset_time_out()  # resets violation variable
 
     try:  # try/catch to catch when the containers crash due to illegal parameter combination
