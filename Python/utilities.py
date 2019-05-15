@@ -12,11 +12,11 @@ If STOP_AFTER is set to True, the script will only evaluate the first STOP_AFTER
 in the folders in datasets. Note that the number of frames in the folders must be larger than STOP_AFTER_FRAMES 
 for the script to work as intended 
 '''
-STOP_AFTER = False
+STOP_AFTER = True
 STOP_AFTER_FRAMES = 100
 
 
-DELAY_START = 1000  # How long to wait for the FFE and encoder microservices to get ready
+DELAY_START = 500  # How long to wait for the FFE and encoder microservices to get ready
 MAX_DROPPED_FRAMES = 0.99 # How many % of frames are allowed to fail to decode after encoding
 MAX_VIOLATION = 1.5  # What is the maximum return value for the minimization algorithm
 
