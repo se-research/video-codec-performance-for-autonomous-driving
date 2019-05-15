@@ -18,6 +18,7 @@ def run(encoder_list):
 
         fig, ax = plt.subplots(figsize=(15, 15))
         encs = {}
+        x_positions = {}
         values = []
         keys = []
         for x in range(len(resolutions)):
@@ -50,9 +51,11 @@ def run(encoder_list):
                         per = (v - encs[H264.TAG]) / encs[H264.TAG]
                         keys.append(k + '\n' + resolution)
                         values.append(per)
+                        x_positions[resolution] += 1
                     except ZeroDivisionError:
                         keys.append(k + '\n' + resolution)
                         values.append(0)
+                        x_positions[resolution] += 1
         
 
         # initialize our bar width and the subplot
@@ -73,6 +76,9 @@ def run(encoder_list):
         ax.axhline(y=0, color='black')
         output_path = utilities.get_comparison_output_graph_path()
         plt.tick_params(axis='x', which='major', labelsize=10)
+
+        ax.axvline(x=len(x_positions[resolution]) + 0.5, color='#000000')
+
         plt.gcf().subplots_adjust(bottom=0.15)
         plt.tight_layout()
 
