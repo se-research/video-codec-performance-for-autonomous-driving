@@ -110,7 +110,7 @@ def get_default_encoder_config(resolution):
                 4,  # rc-mode
                 0,  # reference-mode
                 ]
-    elif resolution == 'KITTY':
+    elif resolution == 'KITTI':
         return [10,  # gop
                 2000,  # bitrate
                 0,  # ip-period
@@ -157,7 +157,7 @@ def get_default_encoder_config(resolution):
 def objective(gop, bitrate, ip_period, init_qp, qpmin, qpmax, disable_frame_skip, diff_qp_ip, diff_qp_ib,
               num_ref_frame, rc_mode, reference_mode):
 
-    print(TAG)
+    print('Using ' + TAG + ' to encode ' + utilities.get_dataset_name())
     utilities.reset_time_out()  # resets violation variable
 
     try:  # try/catch to catch when the containers crash due to illegal parameter combination
@@ -206,14 +206,15 @@ def objective(gop, bitrate, ip_period, init_qp, qpmin, qpmax, disable_frame_skip
                                            args=[container_ffe.logs(stream=True), utilities.PREFIX_COLOR_FFE])
         thread_logs_encoder = threading.Thread(target=utilities.log_helper, args=[container_encoder.logs(stream=True),
                                                                                   utilities.PREFIX_COLOR_ENCODER])
+
         def handler(signum, frame):
             print('Signal handler called with signal', signum)
             container_ffe.kill()
             container_encoder.kill()
 
-        # Setup alarm on threads, if the container does not terminate before 
-        # the CONTAINER_THREAD_TIMEOUT a kill signal is called. 
-        # Only availible on unix systems. 
+        # Setup alarm on threads, if the container does not terminate before
+        # the CONTAINER_THREAD_TIMEOUT a kill signal is called.
+        # Only availible on unix systems.
         signal.signal(signal.SIGALRM, handler)
         signal.alarm(utilities.get_system_timeout())
 
@@ -224,7 +225,7 @@ def objective(gop, bitrate, ip_period, init_qp, qpmin, qpmax, disable_frame_skip
         thread_logs_encoder.join()
 
         # Disable the alarm
-        signal.alarm(0)       
+        signal.alarm(0)
 
     except Exception as e:
         print(e)
@@ -237,29 +238,33 @@ def objective(gop, bitrate, ip_period, init_qp, qpmin, qpmax, disable_frame_skip
             print(e)
             return utilities.MAX_VIOLATION
 
-    if utilities.get_time_out():  # FFE timed out due to compression time constraint violated
+    # FFE timed out due to compression time constraint violated
+    if utilities.get_time_out():
         print('--------- TIMED OUT ---------')
         return utilities.MAX_VIOLATION
 
-    file = open(utilities.get_output_report_path() + '/' + _local_variables['report_name'], 'r')  # opens report generated
-    plots = csv.reader(file, delimiter=';')
+    file = open(utilities.get_output_report_path() + '/' + _local_variables['report_name'],
+                'r')  # opens generated report
+    report_file = csv.reader(file, delimiter=';')
 
-    time_violations=[]
-    ssim =[]
-    for row in plots:
-        ssim.append(float(row[10]))  # accomulate values in SSIM column
+    time_violations = []
+    ssim = []
+    for row in report_file:
+        ssim.append(float(row[10]))  # accomulate values in SSIM column in csv
+        time = float(row[12])  # extract compression time from csv
 
-        time = float(row[12])
-        if time > 40000:  # scales violation time up to 250 % (2.5) violation
+        if time > 40000:  # if compression time is more than the allowed 40 ms
             time_violations.append(time)
 
+    frames = len(ssim) + 1 # to account for the one frame that some encoders do not encode
+
     # return MAX_VIOLATION if dropped frames are more than MAX_DROPPED_FRAMES
-    if len(ssim) / (utilities.get_dataset_lenght() - 1) < utilities.MAX_DROPPED_FRAMES:
+    if frames / (utilities.get_dataset_lenght()) < utilities.MAX_DROPPED_FRAMES:
         print('--------- DROPPED FRAMES EXCEEDED MAX_DROPPED_FRAMES ---------')
         return utilities.MAX_VIOLATION
 
     if time_violations:  # if the list is not empty
-        return mean(time_violations) / 40000
+        return mean(time_violations) / 40000 # returns mean of violation time (between 1 and MAX_VIOLATION)
 
     if not ssim:  # if the list is empty
         print('--------- EMPTY FILE ---------')
