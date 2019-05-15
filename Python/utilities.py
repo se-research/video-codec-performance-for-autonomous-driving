@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import socket
 from datetime import datetime
 from math import ceil
+import image_size.get_image_size as image_size
 
 CID = '112'
 SHARED_MEMORY_AREA = 'video1'
@@ -15,7 +16,7 @@ system_timeout = 0
 DELAY_START = 300
 TIMEOUT = 60
 START_UP = 30
-MAX_DROPPED_FRAMES = 0.95 # in %
+MAX_DROPPED_FRAMES = 0.99 # in %
 
 pngs_path = 'not_set'
 dataset = 'not_set'
@@ -44,32 +45,40 @@ RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '7
 run_name = 'not_set'
 
 dataset_length = 0
-            
+kitti_res = False
 
 def get_dataset_lenght():
     return dataset_length
 
 
-def set_system_timeout(dataset):
-    global system_timeout
+def set_dataset_length(dataset):
     global dataset_length
     dir = DATASETS_PATH + '/' + dataset
     onlyfiles = next(os.walk(dir))[2]
 
     # number of files in dir
-    dataset_length = len(onlyfiles) # set dataset_length to number of frames
+    dataset_length = len(onlyfiles)  # set dataset_length to number of frames
+    set_system_timeout(dataset_length)
+
+
+def set_system_timeout(dataset_length):
+    global system_timeout
+
     system_timeout = dataset_length
+
     # multiply the frames with the timeout (total max duration for the frame compression)
     system_timeout *= (TIMEOUT)
+
     # add delay_start
     system_timeout += DELAY_START
-    system_timeout = system_timeout/1000 # convert to seconds
+    system_timeout = system_timeout/1000  # convert to seconds
 
     # round-up and convert to int  + *2 for some leeway
     system_timeout = int(ceil(system_timeout)) * 2 
+
+    # add start-up time to the timeout
     system_timeout += START_UP
-    print('dataset length: ' + str(dataset_length))
-    print('system timeout: ' + str(system_timeout)) 
+
 
 def get_system_timeout():
     return system_timeout
@@ -206,8 +215,22 @@ def get_best_config_name():
 def set_dataset(name):
     global pngs_path
     global dataset
+    global kitti_res
+
     dataset = name
     pngs_path = os.path.join(os.getcwd(), '../datasets/' + name)
+
+    files = next(os.walk(pngs_path))[2]
+
+    kitti_res = False   # set to false for each iteration
+    if image_size.get_image_size(DATASETS_PATH + '/' + dataset + '/' + files[0]) == (1392, 512):
+        print('Dataset with KITTI resolution detected. The script will only evaluate the dataset in its '
+              'original resolution (1392x512)')
+        kitti_res = True    # the first file in the dataset is of KITTI res (assume all are that res)
+
+
+def get_kitti_res_flag():
+    return kitti_res
 
 
 def get_pngs_path():

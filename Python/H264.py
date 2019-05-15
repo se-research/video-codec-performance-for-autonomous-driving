@@ -156,7 +156,7 @@ def get_default_encoder_config(resolution):
                 0,  # scene_change_detect
                 0,  # padding
                 ]
-    elif resolution == 'KITTY':
+    elif resolution == 'KITTI':
         return [5000000,  # bitrate
                 194700,  # max_bitrate
                 250,  # qop
@@ -230,7 +230,7 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
               prefix_nal, entropy_coding, frame_skip, qp_max, qp_min, long_term_ref, loop_filter, denoise,
               background_detection, adaptive_quant, frame_cropping, scene_change_detect, padding):
 
-    print(TAG)
+    print('Using ' + TAG + ' to encode ' + utilities.get_dataset_name())
     utilities.reset_time_out()  # resets violation variable
 
     try:  # try/catch to catch when the containers crash due to illegal parameter combination
@@ -324,25 +324,27 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
         print('--------- TIMED OUT ---------')
         return utilities.MAX_VIOLATION
 
-    file = open(utilities.get_output_report_path() + '/' + _local_variables['report_name'], 'r')  # opens report generated
-    plots = csv.reader(file, delimiter=';')
+    file = open(utilities.get_output_report_path() + '/' + _local_variables['report_name'], 'r')  # opens generated report
+    report_file = csv.reader(file, delimiter=';')
 
     time_violations=[]
     ssim =[]
-    for row in plots:
-        ssim.append(float(row[10]))  # accomulate values in SSIM column
+    for row in report_file:
+        ssim.append(float(row[10]))  # accomulate values in SSIM column in csv
+        time = float(row[12])   # extract compression time from csv
 
-        time = float(row[12])
-        if time > 40000:  # scales violation time up to 250 % (2.5) violation
+        if time > 40000:    # if compression time is more than the allowed 40 ms
             time_violations.append(time)
 
+    frames = len(ssim) + 1 # to account for the one frame that some encoders do not encode
+
     # return MAX_VIOLATION if dropped frames are more than MAX_DROPPED_FRAMES
-    if len(ssim) / (utilities.get_dataset_lenght() - 1) < utilities.MAX_DROPPED_FRAMES:
+    if frames / (utilities.get_dataset_lenght()) < utilities.MAX_DROPPED_FRAMES:
         print('--------- DROPPED FRAMES EXCEEDED MAX_DROPPED_FRAMES ---------')
         return utilities.MAX_VIOLATION
 
     if time_violations:  # if the list is not empty
-        return mean(time_violations) / 40000
+        return mean(time_violations) / 40000 # returns mean of violation time (between 1 and MAX_VIOLATION)
 
     if not ssim:  # if the list is empty
         print('--------- EMPTY FILE ---------')
