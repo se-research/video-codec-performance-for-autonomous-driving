@@ -12,7 +12,7 @@ TIMED_OUT_MSG_BYTES = str.encode('[frame-feed-evaluator]: Timed out while waitin
 TIMED_OUT = False
 
 system_timeout = 0
-DELAY_START = 1000
+DELAY_START = 300
 TIMEOUT = 60
 START_UP = 30
 MAX_DROPPED_FRAMES = 0.95 # in %
@@ -28,6 +28,7 @@ OUTPUT_CONVERGENCE_PATH = os.path.join(os.getcwd(), '../output/not_set/convergen
 OUTPUT_GRAPH_PATH = os.path.join(os.getcwd(), '../output/not_set/graphs')
 OUTPUT_BEST_CONFIG_REPORT_PATH = os.path.join(os.getcwd(), '../output/not_set/best_config_report')
 OUTPUT_JOINT_GRAPH_PATH = os.path.join(os.getcwd(), '../output/not_set/joint_graphs')
+OUTPUT_COMPARISON_GRAPH_PATH = os.path.join(os.getcwd(), '../output/not_set/comparison_graphs')
 
 PREFIX_COLOR_FFE = '92'
 PREFIX_COLOR_ENCODER = '94'
@@ -228,6 +229,8 @@ def get_output_graph_path():
 def get_joint_output_graph_path():
     return OUTPUT_JOINT_GRAPH_PATH
 
+def get_comparison_output_graph_path():
+    return OUTPUT_COMPARISON_GRAPH_PATH
 
 def get_dataset_name():
     return dataset
@@ -273,6 +276,7 @@ def update_run_paths():
     global OUTPUT_GRAPH_PATH
     global OUTPUT_BEST_CONFIG_REPORT_PATH
     global OUTPUT_JOINT_GRAPH_PATH
+    global OUTPUT_COMPARISON_GRAPH_PATH
 
     OUTPUT_REPORT_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name()
                                       + '/reports')
@@ -282,7 +286,7 @@ def update_run_paths():
     OUTPUT_BEST_CONFIG_REPORT_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name()
                                                   + '/best_config_report')
     OUTPUT_JOINT_GRAPH_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name() + '/joint_graphs')
-
+    OUTPUT_COMPARISON_GRAPH_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name() + '/comparison_graphs')
 
 def get_run_name():
     return run_name
