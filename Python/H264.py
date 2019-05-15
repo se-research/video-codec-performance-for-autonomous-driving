@@ -294,7 +294,7 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
             container_encoder.kill()
 
         # Setup alarm on threads, if the container does not terminate before 
-        # the CONTAINER_THREAD_TIMEOUT a kill signal is called. 
+        # the get_system_timeout a kill signal is called.
         # Only availible on unix systems. 
         signal.signal(signal.SIGALRM, handler)
         signal.alarm(utilities.get_system_timeout())

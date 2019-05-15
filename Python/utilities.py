@@ -5,18 +5,43 @@ from datetime import datetime
 from math import ceil
 import image_size.get_image_size as image_size
 
+
+
+'''' 
+If STOP_AFTER is set to True, the script will only evaluate the first STOP_AFTER_FRAMES number of frames
+in the folders in datasets. Note that the number of frames in the folders must be larger than STOP_AFTER_FRAMES 
+for the script to work as intended 
+'''
+STOP_AFTER = False
+STOP_AFTER_FRAMES = 100
+
+
+DELAY_START = 1000  # How long to wait for the FFE and encoder microservices to get ready
+MAX_DROPPED_FRAMES = 0.99 # How many % of frames are allowed to fail to decode after encoding
+MAX_VIOLATION = 1.5  # What is the maximum return value for the minimization algorithm
+
+'''
+The maximum allowed encoding time before the script terminates the encoding attempt and regard the encoder config 
+used as invalid.
+40 = 1 in MAX_VIOLATION. Hence if you change TIMEOUT to 80, change MAX_VIOLATION TO 2
+'''
+TIMEOUT = 60
+
+'''
+Used to add some extra time to the delay the watchdog will wait until it kills the containers as they have
+most likely hung
+'''
+START_UP = 30
+
 CID = '112'
 SHARED_MEMORY_AREA = 'video1'
+############################################
 
-STOP_AFTER = 80
+
 TIMED_OUT_MSG_BYTES = str.encode('[frame-feed-evaluator]: Timed out while waiting for encoded frame.\n')
 TIMED_OUT = False
 
 system_timeout = 0
-DELAY_START = 1000
-TIMEOUT = 60
-START_UP = 30
-MAX_DROPPED_FRAMES = 0.99 # in %
 
 pngs_path = 'not_set'
 dataset = 'not_set'
@@ -37,14 +62,12 @@ max_ssim = 0
 best_config_name = 'not_set'
 time_out = False
 
-MAX_VIOLATION = 1.5
-
 RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']]
-
 run_name = 'not_set'
 
 dataset_length = 0
 kitti_res = False
+
 
 def get_dataset_lenght():
     return dataset_length
@@ -52,11 +75,17 @@ def get_dataset_lenght():
 
 def set_dataset_length(dataset):
     global dataset_length
-    dir = DATASETS_PATH + '/' + dataset
-    onlyfiles = next(os.walk(dir))[2]
 
-    # number of files in dir
-    dataset_length = len(onlyfiles)  # set dataset_length to number of frames
+    if STOP_AFTER:
+        print('STOP_AFTER is set. The script will only evaluate the first STOP_AFTER_FRAMES number of frames in the '
+              'datasets provided (' + str(STOP_AFTER_FRAMES) + ')')
+        dataset_length = STOP_AFTER_FRAMES
+    else:
+        dir = DATASETS_PATH + '/' + dataset
+        onlyfiles = next(os.walk(dir))[2]
+        # number of files in dir
+        dataset_length = len(onlyfiles)  # set dataset_length to number of frames
+
     set_system_timeout(dataset_length)
 
 
