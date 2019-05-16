@@ -212,7 +212,7 @@ class AstaZero_RuralRoad:
                                46,  # drop_frame
                                1,  # resize_allowed
                                84,  # resize_up
-                               121,  # resize_down
+                               21,  # resize_down
                                23,  # undershoot_pct
                                78,  # overshoot_pct
                                32,  # min_q
@@ -231,7 +231,7 @@ class AstaZero_RuralRoad:
                                46,  # drop_frame
                                1,  # resize_allowed
                                84,  # resize_up
-                               121,  # resize_down
+                               21,  # resize_down
                                23,  # undershoot_pct
                                78,  # overshoot_pct
                                32,  # min_q
