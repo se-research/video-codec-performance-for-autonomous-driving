@@ -18,7 +18,7 @@ import FFE
 width = '640'
 height = '480'
 
-N_CALLS = 120
+N_CALLS = 80
 
 config = 0
 
@@ -87,7 +87,7 @@ def update_report_name_callback(_):
 if __name__ == '__main__':
     docker_client = docker.from_env()
 
-    encoders = [VP9, H264, QSV_H264, QSV_VP9] # QSV_VP9 not avail on Brick, FFE fails on encode on X264
+    encoders = [QSV_VP9, QSV_H264, H264, VP9] # QSV_VP9 not avail on Brick, FFE fails on encode on X264
 
     datasets = utilities.get_datasets()
     if not datasets:
@@ -141,7 +141,7 @@ if __name__ == '__main__':
                                               dimensions=encoder.SPACE,
                                               base_estimator=None,
                                               n_calls=N_CALLS,
-                                              n_random_starts=20,
+                                              n_random_starts=12,
                                               acq_func="gp_hedge",
                                               acq_optimizer="auto",
                                               x0=encoder.get_default_encoder_config(resolution_name),
