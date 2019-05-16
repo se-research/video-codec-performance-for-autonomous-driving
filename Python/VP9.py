@@ -1,3 +1,4 @@
+ 
 from skopt.space import Integer, Categorical
 from skopt.utils import use_named_args
 from statistics import mean
@@ -8,8 +9,8 @@ import utilities
 import FFE
 import inspect
 
-_local_variables = {}
 
+_local_variables = {}
 
 def set_report_name(name):
     _local_variables['report_name'] = name
@@ -25,49 +26,42 @@ def initialize(init_width='0', init_height='0', resolution=['VGA', '640', '480']
     _local_variables['docker_client'] = docker_client
     _local_variables['report_name'] = report_name
 
-
-REPO = 'https://github.com/chalmers-revere/opendlv-video-h264-encoder.git'
-VERSION = 'v0.0.2'
-TAG = 'h264:' + VERSION
+REPO = 'https://github.com/chalmers-revere/opendlv-video-vpx-encoder.git'
+VERSION = 'v0.0.7'
+TAG = 'vp9:' + VERSION
 
 PARAMETERS = (
-    'bitrate', 'bitrate_max', 'gop', 'rc_mode', 'ecomplexity', 'sps_pps_strategy', 'num_ref_frame', 'ssei',
-    'prefix_nal', 'entropy_coding', 'frame_skip', 'qp_max', 'qp_min', 'long_term_ref', 'loop_filter', 'denoise',
-    'background_detection', 'adaptive_quant', 'frame_cropping', 'scene_change_detect', 'padding'
+    'gop', 'drop_frame', 'resize_allowed', 'resize_up', 'resize_down',
+    'undershoot_pct', 'overshoot_pct', 'min_q', 'end_usage', 'buffer_size', 'buffer_init_size', 'buffer_optimal_size', 'bitrate',
+    'kf_mode', 'kf_min_dist', 'kf_max_dist', 'cpu_used'
 )
 
-# https://www.web3.lu/avc-h264-video-settings/ # https://www.pixeltools.com/rate_control_paper.html
-# https://superuser.com/questions/638069/what-is-the-maximum-and-minimum-of-q-value-in-ffmpeg
-# https://slhck.info/video/2017/02/24/crf-guide.html
-# All parameters available in h264 and their ranges
-SPACE = [Integer(100000, 5000000, name='bitrate'),
-         Integer(100000, 5000000, name='bitrate_max'),
-         Integer(1, 250, name='gop'),
-         Integer(0, 4, name='rc_mode'),
-         Integer(0, 2, name='ecomplexity'),
-         Categorical((0, 1, 2, 3, 6), name='sps_pps_strategy'),
-         Integer(1, 16, name='num_ref_frame'),
-         Categorical((0, 1), name='ssei'),
-         Categorical((0, 1), name='prefix_nal'),
-         Categorical((0, 1), name='entropy_coding'),
-         Categorical((0, 1), name='frame_skip'),
-         Integer(0, 51, name='qp_max'),  # fix
-         Integer(0, 50, name='qp_min'),  # fix
-         Categorical((0, 1), name='long_term_ref'),
-         Integer(0, 2, name='loop_filter'),
-         Categorical((0, 1), name='denoise'),
-         Categorical((0, 1), name='background_detection'),
-         Categorical((0, 1), name='adaptive_quant'),
-         Categorical((0, 1), name='frame_cropping'),
-         Categorical((0, 1), name='scene_change_detect'),
-         Categorical((0, 1), name='padding')
+# http://doxygen.db48x.net/mozilla/html/structvpx__codec__enc__cfg.html
+# Parameters according to https://www.webmproject.org/docs/encoder-parameters/
+SPACE = [Integer(1, 250, name='gop'),
+         Integer(0, 100, name='drop_frame'),
+         Categorical((0, 1), name='resize_allowed'),
+         Integer(0, 100, name='resize_up'),
+         Integer(0, 100, name='resize_down'),
+         Integer(0, 100, name='undershoot_pct'),
+         Integer(0, 100, name='overshoot_pct'),
+         Integer(0, 52, name='min_q'),
+         Categorical((0, 1), name='end_usage'),
+         Integer(0, 6000, name='buffer_size'),
+         Integer(0, 4000, name='buffer_init_size'),
+         Integer(0, 5000, name='buffer_optimal_size'),
+         Integer(100000, 5000000, name='bitrate'),
+         Categorical((0, 1), name='kf_mode'),
+         Categorical((0, 1), name='kf_min_dist'),
+         Integer(0, 250, name='kf_max_dist'),
+         Integer(0, 16, name='cpu_used')
          ]
 
 
 @use_named_args(SPACE)
-def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy, num_ref_frame, ssei,
-              prefix_nal, entropy_coding, frame_skip, qp_max, qp_min, long_term_ref, loop_filter, denoise,
-              background_detection, adaptive_quant, frame_cropping, scene_change_detect, padding):
+def objective(gop, drop_frame, resize_allowed, resize_up, resize_down,
+              undershoot_pct, overshoot_pct, min_q, end_usage, buffer_size, buffer_init_size,
+              buffer_optimal_size, bitrate, kf_mode, kf_min_dist, kf_max_dist, cpu_used):
 
     parameters = []
     frame = inspect.currentframe()
@@ -86,29 +80,27 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
                     '--name=' + utilities.SHARED_MEMORY_AREA,
                     '--width=' + _local_variables['width'],
                     '--height=' + _local_variables['height'],
-                    '--bitrate=' + str(bitrate),
-                    '--bitrate-max=' + str(bitrate_max),
+                    '--vp9',
+                    #'--verbose',
+                    ###################
                     '--gop=' + str(gop),
-                    '--rc-mode=' + str(rc_mode),
-                    '--ecomplexity=' + str(ecomplexity),
-                    '--sps_pps_strategy=' + str(sps_pps_strategy),
-                    '--num_ref_frame=' + str(num_ref_frame),
-                    '--ssei=' + str(ssei),
-                    '--prefix-nal=' + str(prefix_nal),
-                    '--entropy-coding' + str(entropy_coding),
-                    '--frame-skip=' + str(frame_skip),
-                    '--qp-max=' + str(qp_max),
-                    '--qp-min=' + str(qp_min),
-                    '--long-term-ref' + str(long_term_ref),
-                    '--loop-filter=' + str(loop_filter),
-                    '--denoise' + str(denoise),
-                    '--background-detection=' + str(background_detection),
-                    '--adaptive_quant' + str(adaptive_quant),
-                    '--frame-cropping' + str(frame_cropping),
-                    '--scene-change-detect=' + str(scene_change_detect),
-                    '--padding=' + str(padding),
-                    '--threads=4'
-                    #'--verbose'
+                    '--threads=4',
+                    '--drop-frame=' + str(drop_frame),
+                    '--resize-allowed=' + str(resize_allowed),
+                    '--resize-up=' + str(resize_up),
+                    '--resize-down=' + str(resize_down),
+                    '--undershoot-pct=' + str(undershoot_pct),
+                    '--overshoot-pct=' + str(overshoot_pct),
+                    '--min-q=' + str(min_q),
+                    '--end-usage=' + str(end_usage),
+                    '--buffer-size=' + str(buffer_size),
+                    '--buffer-init-size=' + str(buffer_init_size),
+                    '--buffer-optimal-size=' + str(buffer_optimal_size),
+                    '--bitrate=' + str(bitrate),
+                    '--kf-mode=' + str(kf_mode),
+                    '--kf-min-dist=' + str(kf_min_dist),
+                    '--kf-max-dist=' + str(kf_max_dist),
+                    '--cpu-used=' + str(cpu_used)
                     ]
 
         container_ffe = _local_variables['docker_client'].containers.run(FFE.TAG,
@@ -135,14 +127,15 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
                                            args=[container_ffe.logs(stream=True), utilities.PREFIX_COLOR_FFE])
         thread_logs_encoder = threading.Thread(target=utilities.log_helper, args=[container_encoder.logs(stream=True),
                                                                                   utilities.PREFIX_COLOR_ENCODER])
+
         def handler(signum, frame):
             print('Signal handler called with signal', signum)
             container_ffe.kill()
             container_encoder.kill()
 
-        # Setup alarm on threads, if the container does not terminate before 
-        # the get_system_timeout a kill signal is called.
-        # Only availible on unix systems. 
+        # Setup alarm on threads, if the container does not terminate before
+        # get_system_timeout a kill signal is called.
+        # Only availible on unix systems.
         signal.signal(signal.SIGALRM, handler)
         signal.alarm(utilities.get_system_timeout())
 
@@ -171,16 +164,17 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
         print('--------- TIMED OUT ---------')
         return utilities.MAX_VIOLATION
 
-    file = open(utilities.get_output_report_path() + '/' + _local_variables['report_name'], 'r')  # opens generated report
+    file = open(utilities.get_output_report_path() + '/' + _local_variables['report_name'],
+                'r')  # opens generated report
     report_file = csv.reader(file, delimiter=';')
 
-    time_violations=[]
-    ssim =[]
+    time_violations = []
+    ssim = []
     for row in report_file:
         ssim.append(float(row[10]))  # accomulate values in SSIM column in csv
-        time = float(row[12])   # extract compression time from csv
+        time = float(row[12])  # extract compression time from csv
 
-        if time > 40000:    # if compression time is more than the allowed 40 ms
+        if time > 40000:  # if compression time is more than the allowed 40 ms
             time_violations.append(time)
 
     frames = len(ssim) + 1 # to account for the one frame that some encoders do not encode

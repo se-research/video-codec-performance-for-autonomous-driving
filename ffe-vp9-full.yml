@@ -25,19 +25,19 @@ services:
         volumes:
         - /tmp:/tmp
         - $PWD:/host
-        - $PWD/2019-03-22_AstaZero_RuralRoad:/pngs
+        - $PWD/datasets/example:/pngs
         working_dir: /host
         environment:
         - DISPLAY=$DISPLAY
-        command: "--folder=/pngs --report=ffe-rural_road_day_sunny-vp9-vga-c1.csv --cid=111 --name=video0 --crop.x=376 --crop.y=32 --crop.width=640 --crop.height=480 --timeout=2000 --noexitontimeout"
+        command: "--folder=/pngs --report=ffe-rural_road_day_sunny-vp9-vga-c1.csv --cid=111 --name=video0 --crop.x=376 --crop.y=32 --crop.width=640 --crop.height=480 --noexitontimeout"
 
-    video-vp9_test-encoder-amd64:
-        container_name: vp9_test
+    video-vp9-full-encoder-amd64:
+        container_name: vp9-full
         depends_on:
         - frame-feed-evaluator
-        image: vpx_encode:latest
+        image: vp9-full:latest
         network_mode: "host"
         ipc: "host"
         volumes:
         - /tmp:/tmp
-        command: "--cid=111 --name=video0 --width=640 --height=480 --verbose --vp9 --threads=4 --profile=0 --stereo-mode=mono --lag-in-frames=0 --drop-frame=0 --resize-allowed=true --resize-up=0 --resize-down=0 --end-usage=1 --min-q=0 --undershoot-pct=0 --overshoot-pct=0 --buffer-size=6000 --buffer-init-size=4000 --buffer-optimal-size=5000 --kf-mode=0 --kf-min-dist=0 --kf-max-dist=99999 --gop=21"
+        command: "--cid=111 --name=video0 --width=640 --height=480 --vp9 --cpu-used=8"
