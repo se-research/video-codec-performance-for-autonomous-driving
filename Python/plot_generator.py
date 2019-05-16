@@ -41,7 +41,7 @@ def run(best_configs, dataset, codec):
         par1.set_ylim(top=65600, bottom=0)
         par2.set_ylim(top=40000, bottom=0)
 
-        ax.set_title(dataset + ' : [' + codec + ']')
+        ax.set_title(dataset + ' : [' + codec + ']', fontsize='xx-large')
 
         ax.set_ylabel('ssim', color='#ee0000', fontsize='x-large')
         par1.set_ylabel('size', color='#00ee00', fontsize='x-large')

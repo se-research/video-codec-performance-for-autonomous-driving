@@ -17,12 +17,12 @@ def run(encoder_list):
         ind = np.arange(len(resolutions))
 
         fig, ax = plt.subplots(figsize=(15, 15), sharey=True)
-        par1 = ax.twinx()
+        par_x = ax.twiny()
         encs = {}
         x_positions = {}
         values = []
         keys = []
-        count = 0
+        clean_resolutions = {}
         for x in range(len(resolutions)):
             resolution = resolutions[x][0]
             best_configs = []
@@ -51,14 +51,15 @@ def run(encoder_list):
                         continue
                     try:
                         per = ((v - encs[H264.TAG]) / encs[H264.TAG]) * 100
-                        keys.append(k + '\n' + resolution)
+                        clean_resolutions[resolution] = 0
+                        keys.append(k)
                         values.append(per)
                         if resolution in x_positions:
                             x_positions[resolution] += 1
                         else:
                             x_positions[resolution] = 1
                     except ZeroDivisionError:
-                        keys.append(k + '\n' + resolution)
+                        keys.append(k)
                         values.append(0)
                         if resolution in x_positions:
                             x_positions[resolution] += 1
@@ -72,26 +73,40 @@ def run(encoder_list):
         rects1 = ax.bar(np.arange(1, len(keys) + 1), height = values, width = width, color=color_list)
         
         # Set our axes labels, title, tick marks, and then our x ticks.
-        ax.set_ylabel('SSIM CHANGE')
+        ax.set_ylabel('SSIM change in percentage', fontsize='x-large')
         #ax.set_ylim(-20, 20)
-        ax.set_title(dataset)
+        ax.set_title(dataset, fontsize='xx-large')
         ax.set_xticks(np.arange(1, len(keys) + 1))
-
+        
         encs.pop(H264.TAG, None)
+    
         ax.set_xticklabels(keys, rotation = 45, fontsize = 10)
         # Create a horizontal line at the origin
-        ax.axhline(y=0, color='black')
+        ax.axhline(y=0, color='black', label=H264.TAG, linestyle='--')
         output_path = utilities.get_comparison_output_graph_path()
         plt.tick_params(axis='x', which='major', labelsize=10)
         
-        labels = [item.get_text() for item in ax.get_yticklabels()]
-        labels[0] = H264.TAG
-        par1.set_yticklabels(labels)
-        
-        x_positions.popitem()
+        x2_steps = []
+        step_count = 0
+        for key in x_positions:  
+            x2_steps.append(step_count + ((x_positions[key] + 1) / 2))
+            step_count += x_positions[key]
+      
+        if x_positions:
+            x_positions.popitem()
+
+        count = 0
         for key in x_positions: 
             ax.axvline(x=count + x_positions[key] + 0.5, color='#000000')
             count += x_positions[key]
+        
+
+        par_x.set_xlim(ax.get_xlim())
+        par_x.set_xticks(x2_steps)
+        if clean_resolutions.keys():
+            par_x.set_xticklabels(clean_resolutions.keys())
+
+        ax.legend()
         plt.gcf().subplots_adjust(bottom=0.15)
         plt.tight_layout()
 
