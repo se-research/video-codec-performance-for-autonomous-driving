@@ -7,6 +7,7 @@ from skopt.plots import plot_convergence
 import matplotlib.pyplot as plt
 import plot_generator
 import joint_plot_generator
+import resolution_comparison
 import utilities
 import default_configs
 import QSV_H264
@@ -201,7 +202,7 @@ if __name__ == '__main__':
                 best_configs=best_configs,
                 encoder=encoder.TAG,
                 dataset_name=utilities.get_dataset_name()))
-
-        # Runs the joint_plot_generator script to generate a comparision graph of respective encoder's SSIM per res
+            
+        # Generate comparision graphs
         joint_plot_generator.run(joint_plot_encoders)
-
+        resolution_comparison.run(joint_plot_encoders)

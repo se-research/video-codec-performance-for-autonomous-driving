@@ -55,6 +55,7 @@ OUTPUT_GRAPH_PATH = os.path.join(os.getcwd(), '../output/not_set/graphs')
 OUTPUT_BEST_CONFIG_REPORT_PATH = os.path.join(os.getcwd(), '../output/not_set/best_config_report')
 OUTPUT_CONFIGS_REPORT_PATH = os.path.join(os.getcwd(), '../output/not_set/configs')
 OUTPUT_JOINT_GRAPH_PATH = os.path.join(os.getcwd(), '../output/not_set/joint_graphs')
+OUTPUT_COMPARISON_GRAPH_PATH = os.path.join(os.getcwd(), '../output/not_set/comparison_graphs')
 
 PREFIX_COLOR_FFE = '92'
 PREFIX_COLOR_ENCODER = '94'
@@ -310,6 +311,8 @@ def get_output_graph_path():
 def get_joint_output_graph_path():
     return OUTPUT_JOINT_GRAPH_PATH
 
+def get_comparison_output_graph_path():
+    return OUTPUT_COMPARISON_GRAPH_PATH
 
 def get_dataset_name():
     return dataset
@@ -355,6 +358,7 @@ def update_run_paths():
     global OUTPUT_GRAPH_PATH
     global OUTPUT_BEST_CONFIG_REPORT_PATH
     global OUTPUT_JOINT_GRAPH_PATH
+    global OUTPUT_COMPARISON_GRAPH_PATH
     global OUTPUT_CONFIGS_REPORT_PATH
 
     OUTPUT_REPORT_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name()
@@ -364,13 +368,13 @@ def update_run_paths():
     OUTPUT_GRAPH_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name() + '/graphs')
     OUTPUT_BEST_CONFIG_REPORT_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name()
                                                   + '/best_config_report')
+    OUTPUT_COMPARISON_GRAPH_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name() + '/comparison_graphs')
     OUTPUT_JOINT_GRAPH_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name()
                                            + '/joint_graphs')
     OUTPUT_CONFIGS_REPORT_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name()
                                               + '/configs')
 
-
-
+    
 def get_run_name():
     return run_name
 
