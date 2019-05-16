@@ -13,7 +13,7 @@ in the folders in datasets. Note that the number of frames in the folders must b
 for the script to work as intended 
 '''
 STOP_AFTER = True
-STOP_AFTER_FRAMES = 1000
+STOP_AFTER_FRAMES = 100
 
 
 DELAY_START = 500  # How long to wait for the FFE and encoder microservices to get ready
@@ -32,7 +32,6 @@ Used to add some extra time to the delay the watchdog will wait until it kills t
 most likely hung
 '''
 START_UP = 30
-
 
 CID = '112'
 SHARED_MEMORY_AREA = 'video1'
