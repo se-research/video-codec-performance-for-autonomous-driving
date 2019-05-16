@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import plot_generator
 import joint_plot_generator
 import utilities
+import default_configs
 import QSV_H264
 import QSV_VP9
 import H264
@@ -18,7 +19,7 @@ import FFE
 width = '640'
 height = '480'
 
-N_CALLS = 100
+N_CALLS = 80
 
 config = 0
 
@@ -87,7 +88,7 @@ def update_report_name_callback(_):
 if __name__ == '__main__':
     docker_client = docker.from_env()
 
-    encoders = [VP9, H264, QSV_H264, QSV_VP9] # QSV_VP9 not avail on Brick, FFE fails on encode on X264
+    encoders = [VP9, H264, QSV_VP9, QSV_H264] # FFE fails on encode on X264
 
     datasets = utilities.get_datasets()
     if not datasets:
@@ -137,14 +138,18 @@ if __name__ == '__main__':
 
                 start = time.time()
 
+                # Returns default config for the specific dataset, encoder and resolution. If aforementioned combination
+                # is absent in DefaultConfigs, None is return and no default config is used to initialize the optimization
+                x0 = default_configs.DefaultConfigs(encoder.TAG, dataset, resolution_name).config
+
                 minimize_result = gp_minimize(func=encoder.objective,
                                               dimensions=encoder.SPACE,
                                               base_estimator=None,
                                               n_calls=N_CALLS,
-                                              n_random_starts=10,
+                                              n_random_starts=12,
                                               acq_func="gp_hedge",
                                               acq_optimizer="auto",
-                                              x0=encoder.get_default_encoder_config(resolution_name),
+                                              x0=x0,
                                               y0=None,
                                               random_state=None,
                                               verbose=True,
