@@ -9,6 +9,7 @@ import plot_generator
 import joint_plot_generator
 import resolution_comparison
 import utilities
+import default_configs
 import QSV_H264
 import QSV_VP9
 import H264
@@ -19,7 +20,7 @@ import FFE
 width = '640'
 height = '480'
 
-N_CALLS = 100
+N_CALLS = 80
 
 config = 0
 
@@ -88,7 +89,7 @@ def update_report_name_callback(_):
 if __name__ == '__main__':
     docker_client = docker.from_env()
 
-    encoders = [VP9, H264, QSV_H264, QSV_VP9] # QSV_VP9 not avail on Brick, FFE fails on encode on X264
+    encoders = [VP9, H264, QSV_VP9, QSV_H264] # FFE fails on encode on X264
 
     datasets = utilities.get_datasets()
     if not datasets:
@@ -138,14 +139,18 @@ if __name__ == '__main__':
 
                 start = time.time()
 
+                # Returns default config for the specific dataset, encoder and resolution. If aforementioned combination
+                # is absent in DefaultConfigs, None is return and no default config is used to initialize the optimization
+                x0 = default_configs.DefaultConfigs(encoder.TAG, dataset, resolution_name).config
+
                 minimize_result = gp_minimize(func=encoder.objective,
                                               dimensions=encoder.SPACE,
                                               base_estimator=None,
                                               n_calls=N_CALLS,
-                                              n_random_starts=10,
+                                              n_random_starts=12,
                                               acq_func="gp_hedge",
                                               acq_optimizer="auto",
-                                              x0=encoder.get_default_encoder_config(resolution_name),
+                                              x0=x0,
                                               y0=None,
                                               random_state=None,
                                               verbose=True,
@@ -192,13 +197,12 @@ if __name__ == '__main__':
                 # Runs the plot_generator script to generate a performance graph of the current encoder and all resolutions
                 plot_generator.run(best_configs=best_configs, dataset=utilities.get_dataset_name(), codec=encoder.TAG)
 
-                # Add an Encoder object after each encoders' full execution on a dataset
-                joint_plot_encoders.append(utilities.Encoder(
-                    best_configs=best_configs,
-                    encoder=encoder.TAG,
-                    dataset_name=utilities.get_dataset_name()))
-
-        if not utilities.get_kitti_res_flag():
-            # Runs the joint_plot_generator script to generate a comparision graph of respective encoder's SSIM per res
-            joint_plot_generator.run(joint_plot_encoders)
-            resolution_comparison.run(joint_plot_encoders)
+            # Add an Encoder object after each encoders' full execution on a dataset
+            joint_plot_encoders.append(utilities.Encoder(
+                best_configs=best_configs,
+                encoder=encoder.TAG,
+                dataset_name=utilities.get_dataset_name()))
+            
+        # Generate comparision graphs
+        joint_plot_generator.run(joint_plot_encoders)
+        resolution_comparison.run(joint_plot_encoders)

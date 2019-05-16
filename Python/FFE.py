@@ -30,20 +30,32 @@ def get_volumes():
 
 def get_commands():
     if _local_variables:
-        return ['--folder=/pngs',
-                '--report=' + _local_variables['report_name'],
-                '--cid=' + utilities.CID,
-                '--name=' + utilities.SHARED_MEMORY_AREA,
-                '--crop.x=' + utilities.calculate_crop_x(_local_variables['init_width'], _local_variables['width']),
-                '--crop.y=' + utilities.calculate_crop_y(_local_variables['init_height'], _local_variables['height']),
-                '--crop.width=' + _local_variables['width'],
-                '--crop.height=' + _local_variables['height'],
-                '--delay=0',
-                '--delay.start=' + str(utilities.DELAY_START),
-                #'--stopafter=' + str(utilities.STOP_AFTER),
-                '--timeout=' + str(utilities.TIMEOUT)
-                # '--noexitontimeout'
-                #'--verbose'
-                ]
+        if utilities.STOP_AFTER:
+            return ['--folder=/pngs',
+                    '--report=' + _local_variables['report_name'],
+                    '--cid=' + utilities.CID,
+                    '--name=' + utilities.SHARED_MEMORY_AREA,
+                    '--crop.x=' + utilities.calculate_crop_x(_local_variables['init_width'], _local_variables['width']),
+                    '--crop.y=' + utilities.calculate_crop_y(_local_variables['init_height'], _local_variables['height']),
+                    '--crop.width=' + _local_variables['width'],
+                    '--crop.height=' + _local_variables['height'],
+                    '--delay=0',
+                    '--delay.start=' + str(utilities.DELAY_START),
+                    '--stopafter=' + str(utilities.STOP_AFTER_FRAMES),
+                    '--timeout=' + str(utilities.TIMEOUT)
+                    ]
+        else:
+            return ['--folder=/pngs',
+                    '--report=' + _local_variables['report_name'],
+                    '--cid=' + utilities.CID,
+                    '--name=' + utilities.SHARED_MEMORY_AREA,
+                    '--crop.x=' + utilities.calculate_crop_x(_local_variables['init_width'], _local_variables['width']),
+                    '--crop.y=' + utilities.calculate_crop_y(_local_variables['init_height'], _local_variables['height']),
+                    '--crop.width=' + _local_variables['width'],
+                    '--crop.height=' + _local_variables['height'],
+                    '--delay=0',
+                    '--delay.start=' + str(utilities.DELAY_START),
+                    '--timeout=' + str(utilities.TIMEOUT)
+                    ]
     else:
         raise Exception('FFE was never initialized. Run the initialize method.')

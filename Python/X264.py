@@ -6,6 +6,7 @@ import threading
 import csv
 import utilities
 import FFE
+import inspect
 
 _local_variables = {}
 
@@ -265,6 +266,14 @@ def objective(gop, preset, tune, scenecut, intra_refresh, bframe, badapt, cabac,
     qpmax, qpstep, bitrate, crf, ipratio, pbratio, aq_mode, aq_strength, weightp, me, merange,
     subme, trellis, nr):
 
+    parameters = []
+    frame = inspect.currentframe()
+    args, _, _, values = inspect.getargvalues(frame)
+    for i in args:
+        parameters.append(str(i) + ': ' + str(values[i]) + '\n')
+
+    utilities.save_config(parameters, utilities.get_report_name())
+
     print('Using ' + TAG + ' to encode ' + utilities.get_dataset_name())
     utilities.reset_time_out()  # resets violation variable
 
@@ -334,7 +343,7 @@ def objective(gop, preset, tune, scenecut, intra_refresh, bframe, badapt, cabac,
             container_encoder.kill()
 
         # Setup alarm on threads, if the container does not terminate before
-        # the CONTAINER_THREAD_TIMEOUT a kill signal is called.
+        # the get_system_timeout a kill signal is called.
         # Only availible on unix systems.
         signal.signal(signal.SIGALRM, handler)
         signal.alarm(utilities.get_system_timeout())

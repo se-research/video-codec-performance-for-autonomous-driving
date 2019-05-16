@@ -7,6 +7,8 @@ import threading
 import csv
 import utilities
 import FFE
+import inspect
+
 
 _local_variables = {}
 
@@ -56,145 +58,18 @@ SPACE = [Integer(1, 250, name='gop'),
          ]
 
 
-def get_default_encoder_config(resolution):
-    if resolution == 'VGA':
-        return [26,  # gop
-                67,  # drop_frame
-                0,  # resize_allowed
-                87,  # resize_up
-                30,  # resize_down
-                22,  # undershoot_pct
-                85,  # overshoot_pct
-                17,  # min_q
-                1,  # end_usage
-                3264,  # buffer_size
-                3268,  # buffer_init_size
-                3519, # buffer_optimal_size
-                2168373,  # bitrate
-                1,  # kf_mode
-                0,  # kf_min_dist
-                93,  # kf_max_dist
-                8 # cpu_used
-                ]
-    elif resolution == 'SVGA':
-        return [159,  # gop
-                0,  # drop_frame
-                1,  # resize_allowed
-                0,  # resize_up
-                93,  # resize_down
-                95,  # undershoot_pct
-                16,  # overshoot_pct
-                13,  # min_q
-                0,  # end_usage
-                6000,  # buffer_size
-                1147,  # buffer_init_size
-                0, # buffer_optimal_size
-                3895523,  # bitrate
-                1,  # kf_mode
-                1,  # kf_min_dist
-                163,  # kf_max_dist
-                9  # cpu_used
-                ]
-    elif resolution == 'XGA':
-        return [68,  # gop
-                18,  # drop_frame
-                1,  # resize_allowed
-                90,  # resize_up
-                100,  # resize_down
-                31,  # undershoot_pct
-                31,  # overshoot_pct
-                44,  # min_q
-                1,  # end_usage
-                5425,  # buffer_size
-                4000,  # buffer_init_size
-                1445, # buffer_optimal_size
-                2194015,  # bitrate
-                0,  # kf_mode
-                0,  # kf_min_dist
-                173,  # kf_max_dist
-                6  # cpu_used
-                ]
-    elif resolution == 'WXGA':
-        return [243,  # gop
-                0,  # drop_frame
-                1,  # resize_allowed
-                73,  # resize_up
-                28,  # resize_down
-                20,  # undershoot_pct
-                0,  # overshoot_pct
-                26,  # min_q
-                0,  # end_usage
-                0,  # buffer_size
-                0,  # buffer_init_size
-                3275, # buffer_optimal_size
-                3559766,  # bitrate
-                1,  # kf_mode
-                0,  # kf_min_dist
-                0,  # kf_max_dist
-                8  # cpu_used
-                ]
-    elif resolution == 'KITTI':
-        return [250,  # gop
-                0,  # drop_frame
-                0,  # resize_allowed
-                100,  # resize_up
-                100,  # resize_down
-                100,  # undershoot_pct
-                0,  # overshoot_pct
-                41,  # min_q
-                1,  # end_usage
-                6000,  # buffer_size
-                444,  # buffer_init_size
-                3547, # buffer_optimal_size
-                5000000,  # bitrate
-                0,  # kf_mode
-                0,  # kf_min_dist
-                250,  # kf_max_dist
-                6  # cpu_used
-                ]
-    elif resolution == 'FHD':
-        return [250,  # gop
-                0,  # drop_frame
-                0,  # resize_allowed
-                100,  # resize_up
-                100,  # resize_down
-                100,  # undershoot_pct
-                0,  # overshoot_pct
-                41,  # min_q
-                1,  # end_usage
-                6000,  # buffer_size
-                444,  # buffer_init_size
-                3547, # buffer_optimal_size
-                5000000,  # bitrate
-                0,  # kf_mode
-                0,  # kf_min_dist
-                250,  # kf_max_dist
-                16  # cpu_used
-                ]
-    elif resolution == 'QXGA':
-        return [250,  # gop
-                0,  # drop_frame
-                0,  # resize_allowed
-                100,  # resize_up
-                100,  # resize_down
-                100,  # undershoot_pct
-                0,  # overshoot_pct
-                41,  # min_q
-                1,  # end_usage
-                6000,  # buffer_size
-                444,  # buffer_init_size
-                3547, # buffer_optimal_size
-                5000000,  # bitrate
-                0,  # kf_mode
-                0,  # kf_min_dist
-                250,  # kf_max_dist
-                16  # cpu_used
-                ]
-
 @use_named_args(SPACE)
 def objective(gop, drop_frame, resize_allowed, resize_up, resize_down,
               undershoot_pct, overshoot_pct, min_q, end_usage, buffer_size, buffer_init_size,
               buffer_optimal_size, bitrate, kf_mode, kf_min_dist, kf_max_dist, cpu_used):
+
+    parameters = []
+    frame = inspect.currentframe()
+    args, _, _, values = inspect.getargvalues(frame)
+    for i in args:
+        parameters.append(str(i) + ': ' + str(values[i]) + '\n')
+
+    utilities.save_config(parameters, utilities.get_report_name())
 
     print('Using ' + TAG + ' to encode ' + utilities.get_dataset_name())
     utilities.reset_time_out()  # resets violation variable
@@ -259,7 +134,7 @@ def objective(gop, drop_frame, resize_allowed, resize_up, resize_down,
             container_encoder.kill()
 
         # Setup alarm on threads, if the container does not terminate before
-        # the CONTAINER_THREAD_TIMEOUT a kill signal is called.
+        # get_system_timeout a kill signal is called.
         # Only availible on unix systems.
         signal.signal(signal.SIGALRM, handler)
         signal.alarm(utilities.get_system_timeout())

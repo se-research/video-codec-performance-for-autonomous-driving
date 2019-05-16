@@ -6,7 +6,7 @@ import threading
 import csv
 import utilities
 import FFE
-
+import inspect
 
 _local_variables = {}
 
@@ -58,145 +58,17 @@ SPACE = [Integer(1, 250, name='gop'),
          ]
 
 
-def get_default_encoder_config(resolution):
-    if resolution == 'VGA':
-        return [160,  # gop
-                2868,  # bitrate
-                20,  # ip-period
-                25,  # init-qp
-                1,  # qpmin
-                25,  # qpmax
-                0,  # disable-frame-skip
-                12,  # diff-qp-ip
-                31,  # diff-qp-ib
-                10,  # num-ref-frame
-                1,  # rc-mode
-                2,  # profile
-                1,  # cabac
-                1,  # dct8x8
-                0,  # deblock-filter
-                0,  # prefix-nal
-                31,  # idr-interval
-                ]
-    elif resolution == 'SVGA':
-        return [225,  # gop
-                2253,  # bitrate
-                35,  # ip-period
-                13,  # init-qp
-                27,  # qpmin
-                41,  # qpmax
-                1,  # disable-frame-skip
-                20,  # diff-qp-ip
-                17,  # diff-qp-ib
-                11,  # num-ref-frame
-                3,  # rc-mode
-                1,  # profile
-                1,  # cabac
-                1,  # dct8x8
-                0,  # deblock-filter
-                0,  # prefix-nal
-                22,  # idr-interval
-                ]
-    elif resolution == 'XGA':
-        return [47,  # gop
-                2474,  # bitrate
-                35,  # ip-period
-                37,  # init-qp
-                24,  # qpmin
-                25,  # qpmax
-                0,  # disable-frame-skip
-                7,  # diff-qp-ip
-                21,  # diff-qp-ib
-                9,  # num-ref-frame
-                2,  # rc-mode
-                2,  # profile
-                1,  # cabac
-                0,  # dct8x8
-                0,  # deblock-filter
-                1,  # prefix-nal
-                45,  # idr-interval
-                ]
-    elif resolution == 'WXGA':
-        return [47,  # gop
-                2474,  # bitrate
-                35,  # ip-period
-                37,  # init-qp
-                24,  # qpmin
-                25,  # qpmax
-                0,  # disable-frame-skip
-                7,  # diff-qp-ip
-                21,  # diff-qp-ib
-                9,  # num-ref-frame
-                2,  # rc-mode
-                2,  # profile
-                1,  # cabac
-                0,  # dct8x8
-                0,  # deblock-filter
-                1,  # prefix-nal
-                45,  # idr-interval
-                ]
-    elif resolution == 'KITTI':
-        return [47,  # gop
-                2474,  # bitrate
-                35,  # ip-period
-                37,  # init-qp
-                24,  # qpmin
-                25,  # qpmax
-                0,  # disable-frame-skip
-                7,  # diff-qp-ip
-                21,  # diff-qp-ib
-                9,  # num-ref-frame
-                2,  # rc-mode
-                2,  # profile
-                1,  # cabac
-                0,  # dct8x8
-                0,  # deblock-filter
-                1,  # prefix-nal
-                45,  # idr-interval
-                ]
-    elif resolution == 'FHD':
-        return [47,  # gop
-                2474,  # bitrate
-                35,  # ip-period
-                37,  # init-qp
-                24,  # qpmin
-                25,  # qpmax
-                0,  # disable-frame-skip
-                7,  # diff-qp-ip
-                21,  # diff-qp-ib
-                9,  # num-ref-frame
-                2,  # rc-mode
-                2,  # profile
-                1,  # cabac
-                0,  # dct8x8
-                0,  # deblock-filter
-                1,  # prefix-nal
-                45,  # idr-interval
-                ]
-    elif resolution == 'QXGA':
-        return [47,  # gop
-                2474,  # bitrate
-                35,  # ip-period
-                37,  # init-qp
-                24,  # qpmin
-                25,  # qpmax
-                0,  # disable-frame-skip
-                7,  # diff-qp-ip
-                21,  # diff-qp-ib
-                9,  # num-ref-frame
-                2,  # rc-mode
-                2,  # profile
-                1,  # cabac
-                0,  # dct8x8
-                0,  # deblock-filter
-                1,  # prefix-nal
-                45,  # idr-interval
-                ]
-
-
 @use_named_args(SPACE)
 def objective(gop, bitrate, ip_period, init_qp, qpmin, qpmax, disable_frame_skip, diff_qp_ip, diff_qp_ib,
               num_ref_frame, rc_mode, profile, cabac, dct8x8, deblock_filter, prefix_nal, idr_interval):
+
+    parameters = []
+    frame = inspect.currentframe()
+    args, _, _, values = inspect.getargvalues(frame)
+    for i in args:
+        parameters.append(str(i) + ': ' + str(values[i]) + '\n')
+
+    utilities.save_config(parameters, utilities.get_report_name())
 
     print('Using ' + TAG + ' to encode ' + utilities.get_dataset_name())
     utilities.reset_time_out()  # resets violation variable
@@ -259,7 +131,7 @@ def objective(gop, bitrate, ip_period, init_qp, qpmin, qpmax, disable_frame_skip
             container_encoder.kill()
 
         # Setup alarm on threads, if the container does not terminate before
-        # the CONTAINER_THREAD_TIMEOUT a kill signal is called.
+        # the get_system_timeout a kill signal is called.
         # Only availible on unix systems.
         signal.signal(signal.SIGALRM, handler)
         signal.alarm(utilities.get_system_timeout())
