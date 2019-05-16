@@ -6,6 +6,7 @@ import threading
 import csv
 import utilities
 import FFE
+import inspect
 
 _local_variables = {}
 
@@ -264,6 +265,14 @@ def get_default_encoder_config(resolution):
 def objective(gop, preset, tune, scenecut, intra_refresh, bframe, badapt, cabac, rc_mode, qp, qpmin,
     qpmax, qpstep, bitrate, crf, ipratio, pbratio, aq_mode, aq_strength, weightp, me, merange,
     subme, trellis, nr):
+
+    parameters = []
+    frame = inspect.currentframe()
+    args, _, _, values = inspect.getargvalues(frame)
+    for i in args:
+        parameters.append(str(i) + ': ' + str(values[i]) + '\n')
+
+    utilities.save_config(parameters, utilities.get_report_name())
 
     print('Using ' + TAG + ' to encode ' + utilities.get_dataset_name())
     utilities.reset_time_out()  # resets violation variable

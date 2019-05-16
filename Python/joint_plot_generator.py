@@ -43,7 +43,7 @@ def run(encoder_list):
                     ax.tick_params(axis='y', colors='#ee0000')
                     #ax.set_ylim(top=1, bottom=0)
 
-                    ax.set_title(dataset + ' : [' + resolution + ']')
+                    ax.set_title(dataset + ' : [' + resolution + ']', fontsize='xx-large')
 
                     ax.set_ylabel('ssim', color='#ee0000', fontsize='x-large')
 

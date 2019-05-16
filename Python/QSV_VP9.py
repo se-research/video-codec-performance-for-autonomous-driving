@@ -6,6 +6,7 @@ import threading
 import csv
 import utilities
 import FFE
+import inspect
 
 
 _local_variables = {}
@@ -53,109 +54,17 @@ SPACE = [Integer(1, 250, name='gop'),
          ]
 
 
-def get_default_encoder_config(resolution):
-    if resolution == 'VGA':
-        return [250,  # gop
-                5000,  # bitrate
-                0,  # ip-period
-                51,  # init-qp
-                0,  # qpmin
-                0,  # qpmax
-                0,  # disable-frame-skip
-                0,  # diff-qp-ip
-                0,  # diff-qp-ib
-                16,  # num-ref-frame
-                2,  # rc-mode
-                1,  # reference-mode
-                ]
-    elif resolution == 'SVGA':
-        return [149,  # gop
-                3247,  # bitrate
-                10,  # ip-period
-                2,  # init-qp
-                20,  # qpmin
-                51,  # qpmax
-                1,  # disable-frame-skip
-                0,  # diff-qp-ip
-                14,  # diff-qp-ib
-                14,  # num-ref-frame
-                1,  # rc-mode
-                0,  # reference-mode
-                ]
-    elif resolution == 'XGA':
-        return [109,  # gop
-                3399,  # bitrate
-                12,  # ip-period
-                20,  # init-qp
-                27,  # qpmin
-                32,  # qpmax
-                0,  # disable-frame-skip
-                23,  # diff-qp-ip
-                1,  # diff-qp-ib
-                1,  # num-ref-frame
-                1,  # rc-mode
-                1,  # reference-mode
-                ]
-    elif resolution == 'WXGA':
-        return [10,  # gop
-                2000,  # bitrate
-                0,  # ip-period
-                26,  # init-qp
-                1,  # qpmin
-                51,  # qpmax
-                0,  # disable-frame-skip
-                0,  # diff-qp-ip
-                0,  # diff-qp-ib
-                1,  # num-ref-frame
-                4,  # rc-mode
-                0,  # reference-mode
-                ]
-    elif resolution == 'KITTI':
-        return [10,  # gop
-                2000,  # bitrate
-                0,  # ip-period
-                26,  # init-qp
-                1,  # qpmin
-                51,  # qpmax
-                0,  # disable-frame-skip
-                0,  # diff-qp-ip
-                0,  # diff-qp-ib
-                1,  # num-ref-frame
-                4,  # rc-mode
-                0,  # reference-mode
-                ]
-    elif resolution == 'FHD':
-        return [10,  # gop
-                2000,  # bitrate
-                0,  # ip-period
-                26,  # init-qp
-                1,  # qpmin
-                51,  # qpmax
-                0,  # disable-frame-skip
-                0,  # diff-qp-ip
-                0,  # diff-qp-ib
-                1,  # num-ref-frame
-                4,  # rc-mode
-                0,  # reference-mode
-                ]
-    elif resolution == 'QXGA':
-        return [189,  # gop
-                3540,  # bitrate
-                15,  # ip-period
-                44,  # init-qp
-                29,  # qpmin
-                6,  # qpmax
-                0,  # disable-frame-skip
-                24,  # diff-qp-ip
-                19,  # diff-qp-ib
-                9,  # num-ref-frame
-                2,  # rc-mode
-                1,  # reference-mode
-                ]
-
 @use_named_args(SPACE)
 def objective(gop, bitrate, ip_period, init_qp, qpmin, qpmax, disable_frame_skip, diff_qp_ip, diff_qp_ib,
               num_ref_frame, rc_mode, reference_mode):
+
+    parameters = []
+    frame = inspect.currentframe()
+    args, _, _, values = inspect.getargvalues(frame)
+    for i in args:
+        parameters.append(str(i) + ': ' + str(values[i]) + '\n')
+
+    utilities.save_config(parameters, utilities.get_report_name())
 
     print('Using ' + TAG + ' to encode ' + utilities.get_dataset_name())
     utilities.reset_time_out()  # resets violation variable
