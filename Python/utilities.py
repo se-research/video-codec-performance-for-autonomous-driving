@@ -53,6 +53,7 @@ OUTPUT_REPORT_PATH = os.path.join(os.getcwd(), '../output/not_set/reports')
 OUTPUT_CONVERGENCE_PATH = os.path.join(os.getcwd(), '../output/not_set/convergence')
 OUTPUT_GRAPH_PATH = os.path.join(os.getcwd(), '../output/not_set/graphs')
 OUTPUT_BEST_CONFIG_REPORT_PATH = os.path.join(os.getcwd(), '../output/not_set/best_config_report')
+OUTPUT_CONFIGS_REPORT_PATH = os.path.join(os.getcwd(), '../output/not_set/configs')
 OUTPUT_JOINT_GRAPH_PATH = os.path.join(os.getcwd(), '../output/not_set/joint_graphs')
 
 PREFIX_COLOR_FFE = '92'
@@ -68,6 +69,7 @@ run_name = 'not_set'
 dataset_length = 0
 kitti_res = False
 
+report_name = 'not_set'
 
 def get_dataset_lenght():
     return dataset_length
@@ -129,8 +131,13 @@ def get_datasets():
 
 # Returns the report_name in correct format
 def generate_report_name(tag, resolution_name, config):
+    global report_name
     report_name = get_dataset_name() + '-' + tag + '-' + resolution_name + '-' + 'C' + str(
         config) + '.csv'
+    return report_name
+
+
+def get_report_name():
     return report_name
 
 
@@ -141,6 +148,29 @@ def log_helper(log_generator, color):
         if x == TIMED_OUT_MSG_BYTES:
             set_time_out()
 
+# Saves list in output_name as name, creates dir output_path if not already exists
+def save_config(list, name):
+    if not os.path.isdir(OUTPUT_CONFIGS_REPORT_PATH):
+        os.mkdir(OUTPUT_CONFIGS_REPORT_PATH)
+
+    try:
+        config_file = open(OUTPUT_CONFIGS_REPORT_PATH + '/' + name, 'w')  # opens/creates file
+        config_file.writelines(list)
+        print("Parameters saved to: " + OUTPUT_CONFIGS_REPORT_PATH + '/' + name)
+
+    except Exception as e:
+        try:
+            print(
+                'Saving best parameters in ' + OUTPUT_CONFIGS_REPORT_PATH + ' failed. '
+                'Saving best parameters in the same folder as the script. \n' +
+                'Error: ' + str(e))
+
+            config_file = open(os.getcwd() + '/' + name, 'w')  # opens/creates file
+            config_file.writelines(list)
+            print("Best parameters saved: " + os.getcwd() + '/' + name)
+
+        except Exception:
+            print("Failed to save best_config: " + name)
 
 # Saves list in output_name as name, creates dir output_path if not already exists
 def save_list(list, name):
@@ -325,6 +355,7 @@ def update_run_paths():
     global OUTPUT_GRAPH_PATH
     global OUTPUT_BEST_CONFIG_REPORT_PATH
     global OUTPUT_JOINT_GRAPH_PATH
+    global OUTPUT_CONFIGS_REPORT_PATH
 
     OUTPUT_REPORT_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name()
                                       + '/reports')
@@ -333,7 +364,11 @@ def update_run_paths():
     OUTPUT_GRAPH_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name() + '/graphs')
     OUTPUT_BEST_CONFIG_REPORT_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name()
                                                   + '/best_config_report')
-    OUTPUT_JOINT_GRAPH_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name() + '/joint_graphs')
+    OUTPUT_JOINT_GRAPH_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name()
+                                           + '/joint_graphs')
+    OUTPUT_CONFIGS_REPORT_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name()
+                                              + '/configs')
+
 
 
 def get_run_name():

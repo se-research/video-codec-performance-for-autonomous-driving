@@ -6,6 +6,7 @@ import threading
 import csv
 import utilities
 import FFE
+import inspect
 
 _local_variables = {}
 
@@ -67,6 +68,14 @@ SPACE = [Integer(100000, 5000000, name='bitrate'),
 def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy, num_ref_frame, ssei,
               prefix_nal, entropy_coding, frame_skip, qp_max, qp_min, long_term_ref, loop_filter, denoise,
               background_detection, adaptive_quant, frame_cropping, scene_change_detect, padding):
+
+    parameters = []
+    frame = inspect.currentframe()
+    args, _, _, values = inspect.getargvalues(frame)
+    for i in args:
+        parameters.append(str(i) + ': ' + str(values[i]) + '\n')
+
+    utilities.save_config(parameters, utilities.get_report_name())
 
     print('Using ' + TAG + ' to encode ' + utilities.get_dataset_name())
     utilities.reset_time_out()  # resets violation variable

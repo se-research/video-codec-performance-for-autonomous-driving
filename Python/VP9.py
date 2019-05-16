@@ -7,6 +7,8 @@ import threading
 import csv
 import utilities
 import FFE
+import inspect
+
 
 _local_variables = {}
 
@@ -60,6 +62,14 @@ SPACE = [Integer(1, 250, name='gop'),
 def objective(gop, drop_frame, resize_allowed, resize_up, resize_down,
               undershoot_pct, overshoot_pct, min_q, end_usage, buffer_size, buffer_init_size,
               buffer_optimal_size, bitrate, kf_mode, kf_min_dist, kf_max_dist, cpu_used):
+
+    parameters = []
+    frame = inspect.currentframe()
+    args, _, _, values = inspect.getargvalues(frame)
+    for i in args:
+        parameters.append(str(i) + ': ' + str(values[i]) + '\n')
+
+    utilities.save_config(parameters, utilities.get_report_name())
 
     print('Using ' + TAG + ' to encode ' + utilities.get_dataset_name())
     utilities.reset_time_out()  # resets violation variable
