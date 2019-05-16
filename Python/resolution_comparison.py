@@ -6,6 +6,9 @@ import os
 import utilities
 import plot_generator
 import H264
+import VP9
+import QSV_H264
+import QSV_VP9
 
 
 def run(encoder_list):
@@ -22,6 +25,7 @@ def run(encoder_list):
         x_positions = {}
         values = []
         keys = []
+        colors = []
         clean_resolutions = {}
         for x in range(len(resolutions)):
             resolution = resolutions[x][0]
@@ -43,7 +47,6 @@ def run(encoder_list):
                         encs[encoder.encoder] = mean(tmp)
 
             # Calculate other encode = rs as a percentage of H264 for each resolution.
-            
             if H264.TAG in encs:
                 for k, v in encs.items():
                     # Dont append the baseline value.
@@ -54,6 +57,15 @@ def run(encoder_list):
                         clean_resolutions[resolution] = 0
                         keys.append(k)
                         values.append(per)
+                        if(k == VP9.TAG):
+                            colors.append('#cc0000')
+                        elif(k == QSV_H264.TAG):
+                            colors.append('#0000cc')
+                        elif(k == QSV_VP9.TAG):
+                            colors.append('#00cc00')
+                        else:
+                            colors.append('#aaaa00')
+
                         if resolution in x_positions:
                             x_positions[resolution] += 1
                         else:
@@ -65,12 +77,11 @@ def run(encoder_list):
                             x_positions[resolution] += 1
                         else:
                             x_positions[resolution] = 1
+            encs = {}
 
         # initialize our bar width and the subplot
         width = 0.2
-        color_list = ['#aa0000', '#00aa00', '#0000aa', '#aa00aa', '#aaaa00', '#aaff00', '#44ff00']
-        color_list = color_list[:len(encs.keys()) -1]
-        rects1 = ax.bar(np.arange(1, len(keys) + 1), height = values, width = width, color=color_list)
+        rects1 = ax.bar(np.arange(1, len(keys) + 1), height = values, width = width, color=colors)
         
         # Set our axes labels, title, tick marks, and then our x ticks.
         ax.set_ylabel('SSIM change in percentage', fontsize='x-large')
