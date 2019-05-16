@@ -196,13 +196,12 @@ if __name__ == '__main__':
                 # Runs the plot_generator script to generate a performance graph of the current encoder and all resolutions
                 plot_generator.run(best_configs=best_configs, dataset=utilities.get_dataset_name(), codec=encoder.TAG)
 
-                # Add an Encoder object after each encoders' full execution on a dataset
-                joint_plot_encoders.append(utilities.Encoder(
-                    best_configs=best_configs,
-                    encoder=encoder.TAG,
-                    dataset_name=utilities.get_dataset_name()))
+            # Add an Encoder object after each encoders' full execution on a dataset
+            joint_plot_encoders.append(utilities.Encoder(
+                best_configs=best_configs,
+                encoder=encoder.TAG,
+                dataset_name=utilities.get_dataset_name()))
 
-        if not utilities.get_kitti_res_flag():
-            # Runs the joint_plot_generator script to generate a comparision graph of respective encoder's SSIM per res
-            joint_plot_generator.run(joint_plot_encoders)
+        # Runs the joint_plot_generator script to generate a comparision graph of respective encoder's SSIM per res
+        joint_plot_generator.run(joint_plot_encoders)
 
