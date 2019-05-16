@@ -17,10 +17,10 @@ def run(encoder_list):
     else:
         dataset = encoder_list[0].dataset_name
         resolutions = utilities.RESOLUTIONS
-        ind = np.arange(len(resolutions))
 
         fig, ax = plt.subplots(figsize=(15, 15), sharey=True)
         par_x = ax.twiny()
+
         encs = {}
         x_positions = {}
         values = []
@@ -29,6 +29,8 @@ def run(encoder_list):
         clean_resolutions = {}
         for x in range(len(resolutions)):
             resolution = resolutions[x][0]
+            width = resolutions[x][1]
+            height = resolutions[x][2]
             best_configs = []
             encoders_and_configs = []
             for i, encoder in enumerate(encoder_list):
@@ -54,11 +56,12 @@ def run(encoder_list):
                         continue
                     try:
                         per = ((v - encs[H264.TAG]) / encs[H264.TAG]) * 100
-                        clean_resolutions[resolution] = 0
+                        clean_resolutions[resolution + ' (' + width + 'x' +height + ')'] = 0
                         keys.append(k)
                         values.append(per)
                         if(k == VP9.TAG):
                             colors.append('#cc0000')
+
                         elif(k == QSV_H264.TAG):
                             colors.append('#0000cc')
                         elif(k == QSV_VP9.TAG):
