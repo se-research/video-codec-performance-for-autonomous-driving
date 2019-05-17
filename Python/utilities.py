@@ -16,7 +16,7 @@ STOP_AFTER = True
 STOP_AFTER_FRAMES = 900
 
 
-DELAY_START = 500  # How long to wait for the FFE and encoder microservices to get ready
+DELAY_START = 1500  # How long to wait for the FFE and encoder microservices to get ready
 MAX_DROPPED_FRAMES = 0.99 # How many % of frames are allowed to fail to decode after encoding
 MAX_VIOLATION = 1.5  # What is the maximum return value for the minimization algorithm
 
@@ -79,16 +79,16 @@ def get_dataset_lenght():
 def set_dataset_length(dataset):
     global dataset_length
 
-    if STOP_AFTER:
+    dir = DATASETS_PATH + '/' + dataset
+    onlyfiles = next(os.walk(dir))[2]
+    # number of files in dir
+    dataset_length = len(onlyfiles)  # set dataset_length to number of frames
+
+    if STOP_AFTER and dataset_length > STOP_AFTER_FRAMES :
         print('STOP_AFTER is set. The script will only evaluate the first STOP_AFTER_FRAMES number of frames in the '
               'datasets provided (' + str(STOP_AFTER_FRAMES) + ')')
         dataset_length = STOP_AFTER_FRAMES
-    else:
-        dir = DATASETS_PATH + '/' + dataset
-        onlyfiles = next(os.walk(dir))[2]
-        # number of files in dir
-        dataset_length = len(onlyfiles)  # set dataset_length to number of frames
-
+        
     set_system_timeout(dataset_length)
 
 
