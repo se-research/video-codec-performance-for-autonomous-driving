@@ -20,7 +20,7 @@ import FFE
 width = '640'
 height = '480'
 
-N_CALLS = 10
+N_CALLS = 80
 
 config = 0
 
@@ -142,12 +142,11 @@ if __name__ == '__main__':
                 # Returns default config for the specific dataset, encoder and resolution. If aforementioned combination
                 # is absent in DefaultConfigs, None is return and no default config is used to initialize the optimization
                 x0 = default_configs.DefaultConfigs(encoder.TAG, dataset, resolution_name).config
-
                 minimize_result = gp_minimize(func=encoder.objective,
                                               dimensions=encoder.SPACE,
                                               base_estimator=None,
                                               n_calls=N_CALLS,
-                                              n_random_starts=3,
+                                              n_random_starts=12,
                                               acq_func="gp_hedge",
                                               acq_optimizer="auto",
                                               x0=x0,

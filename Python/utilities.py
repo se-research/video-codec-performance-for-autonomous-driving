@@ -89,8 +89,8 @@ def set_dataset_length(dataset):
               'datasets provided (' + str(STOP_AFTER_FRAMES) + ')')
         dataset_length = STOP_AFTER_FRAMES
         
-    set_system_timeout(dataset_length)
-
+    #set_system_timeout(dataset_length)
+    set_system_timeout(300)
 
 def set_system_timeout(dataset_length):
     global system_timeout
