@@ -64,7 +64,7 @@ max_ssim = 0
 best_config_name = 'not_set'
 time_out = False
 
-RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']]
+RESOLUTIONS = [['QXGA', '2048', '1536']] #['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], 
 run_name = 'not_set'
 
 dataset_length = 0
@@ -108,7 +108,7 @@ def set_system_timeout(dataset_length):
 
     # add start-up time to the timeout
     system_timeout += START_UP
-    system_timeout *= 3
+    system_timeout *= 4    
 
 
 def get_system_timeout():
