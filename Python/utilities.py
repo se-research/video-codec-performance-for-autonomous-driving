@@ -89,8 +89,7 @@ def set_dataset_length(dataset):
               'datasets provided (' + str(STOP_AFTER_FRAMES) + ')')
         dataset_length = STOP_AFTER_FRAMES
         
-    #set_system_timeout(dataset_length)
-    set_system_timeout(300)
+    set_system_timeout(dataset_length)
 
 def set_system_timeout(dataset_length):
     global system_timeout
@@ -109,6 +108,7 @@ def set_system_timeout(dataset_length):
 
     # add start-up time to the timeout
     system_timeout += START_UP
+    system_timeout *= 3
 
 
 def get_system_timeout():
