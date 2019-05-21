@@ -7,10 +7,10 @@ import image_size.get_image_size as image_size
 
 
 
-'''' 
+''''
 If STOP_AFTER is set to True, the script will only evaluate the first STOP_AFTER_FRAMES number of frames
-in the folders in datasets. Note that the number of frames in the folders must be larger than STOP_AFTER_FRAMES 
-for the script to work as intended 
+in the folders in datasets. Note that the number of frames in the folders must be larger than STOP_AFTER_FRAMES
+for the script to work as intended
 '''
 STOP_AFTER = True
 STOP_AFTER_FRAMES = 900
@@ -21,7 +21,7 @@ MAX_DROPPED_FRAMES = 0.99 # How many % of frames are allowed to fail to decode a
 MAX_VIOLATION = 1.5  # What is the maximum return value for the minimization algorithm
 
 '''
-The maximum allowed encoding time before the script terminates the encoding attempt and regard the encoder config 
+The maximum allowed encoding time before the script terminates the encoding attempt and regard the encoder config
 used as invalid.
 40 = 1 in MAX_VIOLATION. Hence if you change TIMEOUT to 80, change MAX_VIOLATION TO 2
 '''
@@ -64,7 +64,7 @@ max_ssim = 0
 best_config_name = 'not_set'
 time_out = False
 
-RESOLUTIONS = [['QXGA', '2048', '1536']] #['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], 
+RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']] # 
 run_name = 'not_set'
 
 dataset_length = 0
@@ -88,7 +88,7 @@ def set_dataset_length(dataset):
         print('STOP_AFTER is set. The script will only evaluate the first STOP_AFTER_FRAMES number of frames in the '
               'datasets provided (' + str(STOP_AFTER_FRAMES) + ')')
         dataset_length = STOP_AFTER_FRAMES
-        
+
     set_system_timeout(dataset_length)
 
 def set_system_timeout(dataset_length):
@@ -104,11 +104,11 @@ def set_system_timeout(dataset_length):
     system_timeout = system_timeout/1000  # convert to seconds
 
     # round-up and convert to int  + *2 for some leeway
-    system_timeout = int(ceil(system_timeout)) * 2 
+    system_timeout = int(ceil(system_timeout)) * 2
 
     # add start-up time to the timeout
     system_timeout += START_UP
-    system_timeout *= 4    
+    system_timeout *= 4
 
 
 def get_system_timeout():
@@ -374,7 +374,7 @@ def update_run_paths():
     OUTPUT_CONFIGS_REPORT_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name()
                                               + '/configs')
 
-    
+
 def get_run_name():
     return run_name
 
