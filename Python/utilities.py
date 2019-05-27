@@ -13,7 +13,7 @@ in the folders in datasets. Note that the number of frames in the folders must b
 for the script to work as intended
 '''
 STOP_AFTER = True
-STOP_AFTER_FRAMES = 900
+STOP_AFTER_FRAMES = 50
 
 
 DELAY_START = 1500  # How long to wait for the FFE and encoder microservices to get ready

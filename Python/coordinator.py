@@ -20,7 +20,7 @@ import FFE
 width = '640'
 height = '480'
 
-N_CALLS = 80
+N_CALLS = 15
 
 config = 0
 
@@ -146,7 +146,7 @@ if __name__ == '__main__':
                                               dimensions=encoder.SPACE,
                                               base_estimator=None,
                                               n_calls=N_CALLS,
-                                              n_random_starts=12,
+                                              n_random_starts=5,
                                               acq_func="gp_hedge",
                                               acq_optimizer="auto",
                                               x0=x0,
