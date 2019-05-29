@@ -9,7 +9,10 @@
 #### Adding more datasets
 1) Simply put a folder containing the frames in the datasets folder 
 (`video-codec-performance-for-autonomous-driving/datasets`)  
-_NOTE that only the file format PNG with a resolution of either 2048x1536 (QXGA) or 1392x512 has been tested_
+
+_NOTE_
+The frames must be PNGs with a resolution of either 2048x1536 (QXGA) or 1392x512.
+Every frame of in each dataset must have the same resolution.
 
 #### Run the script
 1. `source ~/py3-environments/coordinator/bin/activate` Activates venv
@@ -25,4 +28,8 @@ optimization iteration.
 - Unix-like OS (tested on Arch Linux 5.0.7, Ubuntu 18.04.02 LTS and MacOS 10.14.5)
 - Docker (version > 18) properly installed
 - Intel QuickSync H.264 and VP9 support (Kaby Lake, Gemini Lake, Coffee Lake, Cannon Lake or later)
+
+#### Acknowledgement
+Christian Berger
+The Revere labratory
 
