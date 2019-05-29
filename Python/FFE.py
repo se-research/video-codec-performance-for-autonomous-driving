@@ -2,6 +2,7 @@ import utilities
 
 _local_variables = {}
 
+# Github repository, release version, and Docker tag
 REPO = 'https://github.com/chrberger/frame-feed-evaluator.git'
 VERSION = 'v0.0.4'
 TAG = 'ffe:' + VERSION
@@ -19,6 +20,7 @@ def initialize(init_width='0', init_height='0', width='0', height='0', report_na
     _local_variables['report_name'] = report_name
 
 
+# Get the volumes for the Docker container
 def get_volumes():
     return {'/tmp/': {'bind': '/tmp', 'mode': 'rw'},
             utilities.get_output_report_path(): {'bind': '/host', 'mode': 'rw'},
@@ -27,7 +29,7 @@ def get_volumes():
                 'mode': 'rw'}
             }
 
-
+# Get the commands used to when starting the Docker container
 def get_commands():
     if _local_variables:
         if utilities.STOP_AFTER:
