@@ -10,6 +10,9 @@ import inspect
 
 _local_variables = {}
 
+REPO = 'https://github.com/chalmers-revere/opendlv-video-h264-encoder.git'
+VERSION = 'v0.0.2'
+TAG = 'h264:' + VERSION
 
 def set_report_name(name):
     _local_variables['report_name'] = name
@@ -26,10 +29,7 @@ def initialize(init_width='0', init_height='0', resolution=['VGA', '640', '480']
     _local_variables['report_name'] = report_name
 
 
-REPO = 'https://github.com/chalmers-revere/opendlv-video-h264-encoder.git'
-VERSION = 'v0.0.2'
-TAG = 'h264:' + VERSION
-
+# Parameter names for appending the best configuration.
 PARAMETERS = (
     'bitrate', 'bitrate_max', 'gop', 'rc_mode', 'ecomplexity', 'sps_pps_strategy', 'num_ref_frame', 'ssei',
     'prefix_nal', 'entropy_coding', 'frame_skip', 'qp_max', 'qp_min', 'long_term_ref', 'loop_filter', 'denoise',
@@ -135,6 +135,8 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
                                            args=[container_ffe.logs(stream=True), utilities.PREFIX_COLOR_FFE])
         thread_logs_encoder = threading.Thread(target=utilities.log_helper, args=[container_encoder.logs(stream=True),
                                                                                   utilities.PREFIX_COLOR_ENCODER])
+        
+        # Timeout handling on hanged container.
         def handler(signum, frame):
             print('Signal handler called with signal', signum)
             container_ffe.kill()
@@ -159,9 +161,9 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
         print(e)
         print("Most likely an illegal encoder config combination")
         try:
-            container_ffe.kill()  # ensures that both containers are killed to not get conflicts for new containers
+            container_ffe.kill()  # Ensures that both containers are killed to not get conflicts for new containers
             container_encoder.kill()
-            return utilities.MAX_VIOLATION  # returns MAX_VIOLATION as SSIM in case of crash
+            return utilities.MAX_VIOLATION  # Returns MAX_VIOLATION as SSIM in case of crash
         except Exception as e:
             print(e)
             return utilities.MAX_VIOLATION
@@ -171,35 +173,36 @@ def objective(bitrate, bitrate_max, gop, rc_mode, ecomplexity, sps_pps_strategy,
         print('--------- TIMED OUT ---------')
         return utilities.MAX_VIOLATION
 
-    file = open(utilities.get_output_report_path() + '/' + _local_variables['report_name'], 'r')  # opens generated report
+    file = open(utilities.get_output_report_path() + '/' + _local_variables['report_name'], 
+                'r')  # Opens generated report
     report_file = csv.reader(file, delimiter=';')
 
     time_violations=[]
     ssim =[]
     for row in report_file:
-        ssim.append(float(row[10]))  # accomulate values in SSIM column in csv
-        time = float(row[12])   # extract compression time from csv
+        ssim.append(float(row[10]))  # Accumulate values in SSIM column in csv
+        time = float(row[12])   # Extract compression time from csv
 
-        if time > 40000:    # if compression time is more than the allowed 40 ms
+        if time > 40000:    # If compression time is more than the allowed 40 ms
             time_violations.append(time)
 
-    frames = len(ssim) + 1 # to account for the one frame that some encoders do not encode
+    frames = len(ssim) + 1 # Account for the one frame that some encoders do not encode
 
-    # return MAX_VIOLATION if dropped frames are more than MAX_DROPPED_FRAMES
+    # Return MAX_VIOLATION if dropped frames are more than MAX_DROPPED_FRAMES
     if frames / (utilities.get_dataset_lenght()) < utilities.MAX_DROPPED_FRAMES:
         print('--------- DROPPED FRAMES EXCEEDED MAX_DROPPED_FRAMES ---------')
         return utilities.MAX_VIOLATION
 
-    if time_violations:  # if the list is not empty
-        return mean(time_violations) / 40000 # returns mean of violation time (between 1 and MAX_VIOLATION)
+    if time_violations: 
+        return mean(time_violations) / 40000 # Returns mean of violation time (between 1 and MAX_VIOLATION)
 
-    if not ssim:  # if the list is empty
+    if not ssim:
         print('--------- EMPTY FILE ---------')
         return utilities.MAX_VIOLATION
 
-    ssim_mean = mean(ssim)  # computes SSIM average
-    if ssim_mean > utilities.get_max_ssim():  # update max_ssim & best_config_name variable
+    ssim_mean = mean(ssim)  # Computes SSIM average
+    if ssim_mean > utilities.get_max_ssim():  # Update max_ssim & best_config_name variable
         utilities.set_max_ssim(ssim_mean)
         utilities.set_best_config_name(_local_variables['report_name'])
 
-    return 1 - ssim_mean  # subtracts mean SSIM from 1 since the algorithm tries to find the minimum
+    return 1 - ssim_mean  # Subtracts mean SSIM from 1 since the algorithm tries to find the minimum
