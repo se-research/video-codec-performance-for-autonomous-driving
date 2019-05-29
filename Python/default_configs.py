@@ -5,7 +5,7 @@ import QSV_H264
 
 
 # Returns default config for the specific dataset, encoder and resolution. If aforementioned combination
-# is absent in DefaultConfigs, None is return and no default config is used to initialize the optimization
+# is absent in DefaultConfigs, None is return and no default config is used to initialize the optimization.
 class DefaultConfigs:
     def __init__(self, encoder, dataset, resolution):
         #self.config = None

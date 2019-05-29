@@ -20,13 +20,16 @@ import FFE
 width = '640'
 height = '480'
 
+'''
+Optimization algorithm iterations.
+'''
 N_CALLS = 80
 
 config = 0
 
 '''
-Builds the required Docker images based on the provided TAG and REPO
-Blocks execution until the images are successfully built
+Builds the required Docker images based on the provided TAG and REPO.
+Blocks execution until the images are successfully built.
 '''
 def build():
     def build_ffe():
@@ -77,7 +80,7 @@ def build():
 
 
 '''
-Increments the config number after each optimization iteration
+Increments the config number after each optimization iteration.
 '''
 def update_report_name_callback(_):
     global config
