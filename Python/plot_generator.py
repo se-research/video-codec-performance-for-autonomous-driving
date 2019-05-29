@@ -58,6 +58,8 @@ def run(best_configs, dataset, codec):
                 tmp_ssim = []
                 tmp_size = []
                 tmp_time = []
+
+                # Extract values from .csv report
                 for row in plots:
                     tmp_ssim.append(float(row[10]))
                     tmp_size.append(float(row[6]))
@@ -69,9 +71,12 @@ def run(best_configs, dataset, codec):
                 position_x[1].append(size_x)
                 position_x[0].append(ssim_x)
                 position_x[2].append(time_x)
+
                 # Do not add delimiter line on the last item.
                 if not i == (len(best_configs) - 1):
                     ax.axvline(x=time_x + 0.5, color='#000000')
+
+                # Increment x positions after one iteration
                 ssim_x += 3
                 size_x += 3
                 time_x += 3
@@ -105,11 +110,12 @@ def run(best_configs, dataset, codec):
         x_width = position_x[2][-1] + 1
         plt.xlim([0, x_width])
 
+        # Add resolution name
         resolution_and_configs = []
         for bc in best_configs:
             resolution_and_configs.append(bc.resolution_name + '\n')
 
-        # Extract config number from best config name.
+        # Extract config number from best config name and add it to corresponding resolution name in list
         for i, bc in enumerate(best_configs):
             firstStep = bc.best_config_name.split('.')[-2]
             secondStep = firstStep.split('-')[-1]
