@@ -38,7 +38,6 @@ def run(encoder_list):
                 # Returns indices for best_configs that has the current resolution
                 indices = [idx for idx, bc in enumerate(encoder.best_configs) if bc.resolution_name == resolution]
 
-                # if the list is not empty
                 if indices:
                     path = encoder.best_configs[indices[0]].best_config_report_path
                     with open(path, 'r') as csvfile:
@@ -82,13 +81,12 @@ def run(encoder_list):
                             x_positions[resolution] = 1
             encs = {}
 
-        # initialize our bar width and the subplot
+        # Initialize our bar width and the subplot
         width = 0.2
         rects1 = ax.bar(np.arange(1, len(keys) + 1), height = values, width = width, color=colors)
         
         # Set our axes labels, title, tick marks, and then our x ticks.
         ax.set_ylabel('SSIM change in percentage', fontsize='x-large')
-        #ax.set_ylim(-20, 20)
         ax.set_title(dataset, fontsize='xx-large')
         ax.set_xticks(np.arange(1, len(keys) + 1))
         
