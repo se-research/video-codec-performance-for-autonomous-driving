@@ -11,8 +11,8 @@ import inspect
 _local_variables = {}
 
 # Github repository, release version, and Docker tag
-REPO = 'https://github.com/guslauer/video-qsv-h264-encoder.git'
-VERSION = 'v0.0.1'
+REPO = 'https://github.com/chrberger/video-qsv-h264-encoder.git'
+VERSION = 'v0.0.2'
 TAG = 'qsv-h264:' + VERSION
 
 def set_report_name(name):

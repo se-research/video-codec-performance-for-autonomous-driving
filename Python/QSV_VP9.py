@@ -12,7 +12,7 @@ import inspect
 _local_variables = {}
 
 # Github repository, release version, and Docker tag
-REPO = 'https://github.com/guslauer/video-qsv-vp9-encoder.git'
+REPO = 'https://github.com/chrberger/video-qsv-vp9-encoder.git'
 VERSION = 'v0.0.1'
 TAG = 'qsv-vp9:' + VERSION
 

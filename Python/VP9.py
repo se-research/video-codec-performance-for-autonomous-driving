@@ -14,7 +14,7 @@ _local_variables = {}
 
 # Github repository, release version, and Docker tag
 REPO = 'https://github.com/chalmers-revere/opendlv-video-vpx-encoder.git'
-VERSION = 'v0.0.7'
+VERSION = 'v0.0.8'
 TAG = 'vp9:' + VERSION
 
 def set_report_name(name):
