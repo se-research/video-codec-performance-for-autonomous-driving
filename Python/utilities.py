@@ -5,23 +5,26 @@ from datetime import datetime
 from math import ceil
 import image_size.get_image_size as image_size
 
-
-
-'''' 
+''''
 If STOP_AFTER is set to True, the script will only evaluate the first STOP_AFTER_FRAMES number of frames
-in the folders in datasets. Note that the number of frames in the folders must be larger than STOP_AFTER_FRAMES 
-for the script to work as intended 
+in the folders in datasets. Note that the number of frames in the folders must be larger than STOP_AFTER_FRAMES
+for the script to work as intended
 '''
 STOP_AFTER = True
 STOP_AFTER_FRAMES = 900
 
-
-DELAY_START = 500  # How long to wait for the FFE and encoder microservices to get ready
+'''
+DELAY_START is platform dependant, 1500 is a safe number. 
+    Try to run on a number as low as possible (start at 50).
+MAX_DROPPED_FRAMES can be changed if a higher number of dropped frames is acceptable.
+MAX_VIOLATION is a sane time error violation derived from analysing the behaviour of the gp_minimize function.
+'''
+DELAY_START = 1500  # How long to wait for the FFE and encoder microservices to get ready
 MAX_DROPPED_FRAMES = 0.99 # How many % of frames are allowed to fail to decode after encoding
 MAX_VIOLATION = 1.5  # What is the maximum return value for the minimization algorithm
 
 '''
-The maximum allowed encoding time before the script terminates the encoding attempt and regard the encoder config 
+The maximum allowed encoding time before the script terminates the encoding attempt and regard the encoder config
 used as invalid.
 40 = 1 in MAX_VIOLATION. Hence if you change TIMEOUT to 80, change MAX_VIOLATION TO 2
 '''
@@ -33,14 +36,26 @@ most likely hung
 '''
 START_UP = 30
 
+'''
+CID is the channel id. If other OPENDLV experiments are running on the same platform
+the CID should not overlap. 
+SHARED_MEMORY_AREA is the name of the shared memory, used for communication between
+Docker containers.
+'''
 CID = '112'
 SHARED_MEMORY_AREA = 'video1'
-############################################
 
-
+'''
+TIMED_OUT_MESSAGE_BYTES is used to catch errors from the terminal output.
+TIMED_OUT is true when the TIMED_OUT_MESSAGE_BYTES is caught
+'''
 TIMED_OUT_MSG_BYTES = str.encode('[frame-feed-evaluator]: Timed out while waiting for encoded frame.\n')
 TIMED_OUT = False
 
+'''
+system_timeout initiation, updates dependant on number of frames
+in dataset or STOP_AFTER_FRAMES if STOP_AFTER is true.
+'''
 system_timeout = 0
 
 pngs_path = 'not_set'
@@ -49,6 +64,9 @@ dataset = 'not_set'
 DATASETS_PATH = os.path.join(os.getcwd(), '../datasets')
 OUTPUT_PATH = os.path.join(os.getcwd(), '../output')
 
+'''
+Initiation of output report paths. 
+'''
 OUTPUT_REPORT_PATH = os.path.join(os.getcwd(), '../output/not_set/reports')
 OUTPUT_CONVERGENCE_PATH = os.path.join(os.getcwd(), '../output/not_set/convergence')
 OUTPUT_GRAPH_PATH = os.path.join(os.getcwd(), '../output/not_set/graphs')
@@ -60,13 +78,24 @@ OUTPUT_COMPARISON_GRAPH_PATH = os.path.join(os.getcwd(), '../output/not_set/comp
 PREFIX_COLOR_FFE = '92'
 PREFIX_COLOR_ENCODER = '94'
 
+'''
+Initiation of variables.
+'''
 max_ssim = 0
 best_config_name = 'not_set'
 time_out = False
 
-RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']]
+'''
+Resoulution included in experiment. To extend the experiment more 
+can be added in the same format ([..., [<NAME>, <WIDTH>, <HEIGHT>]]).
+'''
+RESOLUTIONS = [['VGA', '640', '480'], ['SVGA', '800', '600'], ['XGA', '1024', '768'], ['WXGA', '1280', '720'], ['KITTI', '1392', '512'], ['FHD', '1920', '1080'], ['QXGA', '2048', '1536']] # 
 run_name = 'not_set'
 
+'''
+dataset_length is derived from counting the file of the current dataset.
+kitti_res is true if the first png in the dataset has the KITTI resolution.
+'''
 dataset_length = 0
 kitti_res = False
 
@@ -79,36 +108,40 @@ def get_dataset_lenght():
 def set_dataset_length(dataset):
     global dataset_length
 
-    if STOP_AFTER:
+    dir = DATASETS_PATH + '/' + dataset
+    onlyfiles = next(os.walk(dir))[2]
+    # Number of files in dir
+    dataset_length = len(onlyfiles)  # Set dataset_length to number of frames
+
+    if STOP_AFTER and dataset_length > STOP_AFTER_FRAMES :
         print('STOP_AFTER is set. The script will only evaluate the first STOP_AFTER_FRAMES number of frames in the '
               'datasets provided (' + str(STOP_AFTER_FRAMES) + ')')
         dataset_length = STOP_AFTER_FRAMES
-    else:
-        dir = DATASETS_PATH + '/' + dataset
-        onlyfiles = next(os.walk(dir))[2]
-        # number of files in dir
-        dataset_length = len(onlyfiles)  # set dataset_length to number of frames
 
     set_system_timeout(dataset_length)
 
-
+'''
+Calculates a sane system timout.
+The system timeout is used for the signal alarm for hung microservices.
+'''
 def set_system_timeout(dataset_length):
     global system_timeout
 
     system_timeout = dataset_length
 
-    # multiply the frames with the timeout (total max duration for the frame compression)
+    # Multiply the frames with the timeout (total max duration for the frame compression)
     system_timeout *= (TIMEOUT)
 
-    # add delay_start
+    # Add delay_start
     system_timeout += DELAY_START
-    system_timeout = system_timeout/1000  # convert to seconds
+    system_timeout = system_timeout/1000  # Convert to seconds
 
-    # round-up and convert to int  + *2 for some leeway
-    system_timeout = int(ceil(system_timeout)) * 2 
+    # Round-up and convert to int  + *2 for some leeway
+    system_timeout = int(ceil(system_timeout)) * 2
 
-    # add start-up time to the timeout
+    # Add start-up time to the timeout
     system_timeout += START_UP
+    system_timeout *= 4
 
 
 def get_system_timeout():
@@ -155,7 +188,7 @@ def save_config(list, name):
         os.mkdir(OUTPUT_CONFIGS_REPORT_PATH)
 
     try:
-        config_file = open(OUTPUT_CONFIGS_REPORT_PATH + '/' + name, 'w')  # opens/creates file
+        config_file = open(OUTPUT_CONFIGS_REPORT_PATH + '/' + name, 'w')  # Opens/creates file
         config_file.writelines(list)
         print("Parameters saved to: " + OUTPUT_CONFIGS_REPORT_PATH + '/' + name)
 
@@ -166,7 +199,7 @@ def save_config(list, name):
                 'Saving best parameters in the same folder as the script. \n' +
                 'Error: ' + str(e))
 
-            config_file = open(os.getcwd() + '/' + name, 'w')  # opens/creates file
+            config_file = open(os.getcwd() + '/' + name, 'w')  # Opens/creates file
             config_file.writelines(list)
             print("Best parameters saved: " + os.getcwd() + '/' + name)
 
@@ -179,7 +212,7 @@ def save_list(list, name):
         os.mkdir(OUTPUT_BEST_CONFIG_REPORT_PATH)
 
     try:
-        best_config_file = open(OUTPUT_BEST_CONFIG_REPORT_PATH + '/' + name, 'w')  # opens/creates file
+        best_config_file = open(OUTPUT_BEST_CONFIG_REPORT_PATH + '/' + name, 'w')  # Opens/creates file
         best_config_file.writelines(list)
         print("Best parameters saved: " + OUTPUT_BEST_CONFIG_REPORT_PATH + '/' + name)
 
@@ -190,7 +223,7 @@ def save_list(list, name):
                 'Saving best parameters in the same folder as the script. \n' +
                 'Error: ' + str(e))
 
-            best_config_file = open(os.getcwd() + '/' + name, 'w')  # opens/creates file
+            best_config_file = open(os.getcwd() + '/' + name, 'w')  # Opens/creates file
             best_config_file.writelines(list)
             print("Best parameters saved: " + os.getcwd() + '/' + name)
 
@@ -206,9 +239,11 @@ def save_convergence(axes, encoder, resolution_name):
     figure = plt.gcf()
     figure.figsize = (16, 8)
 
+    # Create a directory if none is present
     if not os.path.isdir(OUTPUT_CONVERGENCE_PATH):
         os.mkdir(OUTPUT_CONVERGENCE_PATH)
 
+    # Save the convergence plot
     try:
         plt.savefig(
             OUTPUT_CONVERGENCE_PATH + '/' + get_dataset_name() + '-'
@@ -227,6 +262,7 @@ def save_convergence(axes, encoder, resolution_name):
         except Exception:
             print("Failed to save convergence graph: " + encoder.TAG + '-' + resolution_name)
 
+    # Clear the pyplot cache
     plt.clf()
 
 
@@ -281,11 +317,11 @@ def set_dataset(name):
 
     files = next(os.walk(pngs_path))[2]
 
-    kitti_res = False   # set to false for each iteration
+    kitti_res = False   # Set to false for each iteration
     if image_size.get_image_size(DATASETS_PATH + '/' + dataset + '/' + files[0]) == (1392, 512):
         print('Dataset with KITTI resolution detected. The script will only evaluate the dataset in its '
               'original resolution (1392x512)')
-        kitti_res = True    # the first file in the dataset is of KITTI res (assume all are that res)
+        kitti_res = True    # The first file in the dataset is of KITTI res (assume all are that res)
 
 
 def get_kitti_res_flag():
@@ -351,7 +387,7 @@ def update_run_paths():
     path_current_run = OUTPUT_PATH + '/' + run_name + '/'+ get_dataset_name()
     if not os.path.isdir(path_current_run):
         os.mkdir(path_current_run)
-        os.chmod(path_current_run, 0o777)   # # read/write by everyone
+        os.chmod(path_current_run, 0o777)   # Read/write by everyone
 
     global OUTPUT_REPORT_PATH
     global OUTPUT_CONVERGENCE_PATH
@@ -374,7 +410,7 @@ def update_run_paths():
     OUTPUT_CONFIGS_REPORT_PATH = os.path.join(os.getcwd(), '../output/' + get_run_name() + '/' + get_dataset_name()
                                               + '/configs')
 
-    
+
 def get_run_name():
     return run_name
 

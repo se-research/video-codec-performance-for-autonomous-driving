@@ -20,11 +20,17 @@ import FFE
 width = '640'
 height = '480'
 
-N_CALLS = 40
+'''
+Optimization algorithm iterations.
+'''
+N_CALLS = 80
 
 config = 0
 
-
+'''
+Builds the required Docker images based on the provided TAG and REPO.
+Blocks execution until the images are successfully built.
+'''
 def build():
     def build_ffe():
         try:
@@ -73,6 +79,9 @@ def build():
     thread_build_encoder.join()
 
 
+'''
+Increments the config number after each optimization iteration.
+'''
 def update_report_name_callback(_):
     global config
     if config < N_CALLS:
@@ -89,7 +98,7 @@ def update_report_name_callback(_):
 if __name__ == '__main__':
     docker_client = docker.from_env()
 
-    encoders = [H264, VP9, QSV_VP9, QSV_H264] # FFE fails on encode on X264
+    encoders = [VP9, H264, QSV_VP9, QSV_H264]  # FFE fails to encode X264 properly
 
     datasets = utilities.get_datasets()
     if not datasets:
@@ -139,15 +148,15 @@ if __name__ == '__main__':
 
                 start = time.time()
 
-                # Returns default config for the specific dataset, encoder and resolution. If aforementioned combination
-                # is absent in DefaultConfigs, None is return and no default config is used to initialize the optimization
+                # Returns default config for the specific dataset, encoder and resolution. If mentioned combination is
+                # absent in DefaultConfigs, None is return and no default config is used to initialize the optimization
                 x0 = default_configs.DefaultConfigs(encoder.TAG, dataset, resolution_name).config
 
                 minimize_result = gp_minimize(func=encoder.objective,
                                               dimensions=encoder.SPACE,
                                               base_estimator=None,
                                               n_calls=N_CALLS,
-                                              n_random_starts=4,
+                                              n_random_starts=12,
                                               acq_func="gp_hedge",
                                               acq_optimizer="auto",
                                               x0=x0,

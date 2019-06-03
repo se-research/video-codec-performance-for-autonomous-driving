@@ -23,9 +23,8 @@ def run(encoder_list):
                 # Returns indices for best_configs that has the current resolution
                 index = [idx for idx, bc in enumerate(encoder.best_configs) if bc.resolution_name == resolution]
 
-                # if the list is not empty
                 if index:
-                    best_config = encoder.best_configs[index[0]]  # use first index item
+                    best_config = encoder.best_configs[index[0]]  # Use first index item
 
                     best_configs.append(best_config)
 
@@ -41,7 +40,6 @@ def run(encoder_list):
                     ax.autoscale_view(scalex=True)
 
                     ax.tick_params(axis='y', colors='#ee0000')
-                    #ax.set_ylim(top=1, bottom=0)
 
                     ax.set_title(dataset + ' : [' + resolution + ']', fontsize='xx-large')
 
