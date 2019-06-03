@@ -11,8 +11,8 @@
 (`video-codec-performance-for-autonomous-driving/datasets`)  
 
 _NOTE_
-The frames must be PNGs with a resolution of either 2048x1536 (QXGA) or 1392x512.
-Every frame of in each dataset must have the same resolution.
+The frames must be PNGs with a resolution of 2048x1536 (QXGA) (or 'KITTI' resolution - 1392x512).
+Every frame in each dataset must have the same resolution.
 
 #### Run the script
 1. `source ~/py3-environments/coordinator/bin/activate` Activates venv
@@ -30,6 +30,6 @@ optimization iteration.
 - Intel QuickSync H.264 and VP9 support (Kaby Lake, Gemini Lake, Coffee Lake, Cannon Lake or later)
 
 #### Acknowledgement
-Christian Berger
-The Revere labratory
+[Christian Berger](http://www.christianberger.net/)  
+[The Revere labratory](https://www.saferresearch.com/research#revere)
 
