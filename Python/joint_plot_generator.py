@@ -66,7 +66,7 @@ def run(encoder_list):
                         os.mkdir(output_path)
 
                     try:
-                        plt.savefig(output_path + '/' + dataset + '-' + resolution + '.png')
+                        plt.savefig(output_path + '/' + dataset + '-' + resolution + '.svg')
 
                     except Exception as e:
                         try:
@@ -75,7 +75,7 @@ def run(encoder_list):
                                 'Saving graph in the same folder as the script. \n' +
                                 'Error: ' + str(e))
                             plt.savefig(
-                                os.getcwd() + '/' + dataset + '-' + resolution + '.png')
+                                os.getcwd() + '/' + dataset + '-' + resolution + '.svg')
 
                         except Exception:
                             print("Failed to graph from plot_generator: " + dataset + '-' + resolution)

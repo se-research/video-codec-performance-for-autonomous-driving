@@ -126,7 +126,7 @@ def run(encoder_list):
             os.mkdir(output_path)
 
         try:
-            plt.savefig(output_path + '/' + dataset + '.png')
+            plt.savefig(output_path + '/' + dataset + '.svg')
 
         except Exception as e:
             try:
