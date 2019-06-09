@@ -49,6 +49,9 @@ def get_commands():
         if utilities.STOP_AFTER:
             commands.append('--stopafter=' + str(utilities.STOP_AFTER_FRAMES))
 
+        if utilities.START_FRAME:
+            commands.append('--startframe=' + str(utilities.START_FRAME))
+
         return commands
 
     else:

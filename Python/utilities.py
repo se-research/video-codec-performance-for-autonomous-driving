@@ -13,6 +13,13 @@ for the script to work as intended
 STOP_AFTER = True
 STOP_AFTER_FRAMES = 900
 
+''''
+If START_FRAME is set to 0, the script will start evaluating at the start of the dataset. If set to > 0, then it will
+start evaluating at n
+'''
+START_FRAME = 500
+
+
 '''
 DELAY_START is platform dependant, 1500 is a safe number. 
     Try to run on a number as low as possible (start at 50).
