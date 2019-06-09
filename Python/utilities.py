@@ -247,7 +247,7 @@ def save_convergence(axes, encoder, resolution_name):
     try:
         plt.savefig(
             OUTPUT_CONVERGENCE_PATH + '/' + get_dataset_name() + '-'
-            + encoder.TAG + '-' + resolution_name + '.png')
+            + encoder.TAG + '-' + resolution_name + '.svg')
 
     except Exception as e:
         try:
@@ -257,7 +257,7 @@ def save_convergence(axes, encoder, resolution_name):
                 'Error: ' + str(e))
             plt.savefig(
                 os.getcwd() + '/' + get_run_name() + '/' + get_dataset_name() + '-'
-                + encoder.TAG + '-' + resolution_name + '.png')
+                + encoder.TAG + '-' + resolution_name + '.svg')
 
         except Exception:
             print("Failed to save convergence graph: " + encoder.TAG + '-' + resolution_name)
@@ -266,13 +266,9 @@ def save_convergence(axes, encoder, resolution_name):
     plt.clf()
 
 
-# Returns coordinates so that the cropping will grow from the center/bottom line
-def calculate_crop_x(initial_width, width):
-    return str(int(initial_width) / 2 - (int(width) / 2))
-
-
-def calculate_crop_y(initial_height, height):
-    return str(int(initial_height) - (int(height)))
+# Returns coordinates so that the cropping will grow from the center point
+def calculate_crop(initial, desired):
+    return str(int(initial) / 2 - (int(desired) / 2))
 
 
 def set_time_out():
