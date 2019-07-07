@@ -16,8 +16,17 @@ Every frame of in each dataset must have the same resolution.
 
 #### Run the script
 1. `source ~/py3-environments/coordinator/bin/activate` Activates venv
-2. `python3 coordinator.py` Runs script in venv:
+2. `python3 coordinator.py` Runs script in venv
 3. `deactivate` Exit venv
+
+#### Generate graphs from existing reports
+1. `source ~/py3-environments/coordinator/bin/activate` Activates venv
+2. `python3 graph_generator.py <path with datasets>` Generate graphs based on existing reports in provided folder  
+ i.e `python3 graph_generator.py /home/user/project123/output/user-2019_05_19-14_40_34`
+
+_NOTE_
+The graphs will be generated in <path with datasets>/dataset/<encoder_graphs | joint_graphs | comparison_graphs>
+Graphs will be generated in everydata folder
 
 #### Notes
 1. In FFE.py: start.delay parameter needs to be changed according to your machine. If the delay is too low 

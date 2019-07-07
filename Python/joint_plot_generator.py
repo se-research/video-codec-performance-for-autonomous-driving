@@ -6,7 +6,7 @@ import utilities
 import plot_generator
 
 
-def run(encoder_list):
+def run(encoder_list, output_path):
     if len(encoder_list) < 1:
         print('No best_configs passed to joint_plot_generator.')
     else:
@@ -60,7 +60,8 @@ def run(encoder_list):
 
                     plt.xticks(np.arange(1, len(best_configs) + 1, step=1), encoders_and_configs)
 
-                    output_path = utilities.get_joint_output_graph_path()
+                    if output_path == 'not_set':
+                        output_path = utilities.get_joint_output_graph_path()
 
                     if not os.path.isdir(output_path):
                         os.mkdir(output_path)

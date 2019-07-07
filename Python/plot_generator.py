@@ -6,7 +6,7 @@ import utilities
 
 
 # Find files.
-def run(best_configs, dataset, codec):
+def run(best_configs, dataset, codec, output_path):
     if len(best_configs) < 1:
         print('No best_configs passed to plot_generator.')
     else:
@@ -123,7 +123,8 @@ def run(best_configs, dataset, codec):
 
         plt.xticks(np.arange(2, x_width, step=3), resolution_and_configs)
 
-        output_path = utilities.get_output_graph_path()
+        if output_path == 'not_set':
+            output_path = utilities.get_joint_output_graph_path()
 
         if not os.path.isdir(output_path):
             os.mkdir(output_path)

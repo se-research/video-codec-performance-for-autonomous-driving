@@ -11,7 +11,7 @@ import QSV_H264
 import QSV_VP9
 
 
-def run(encoder_list):
+def run(encoder_list, output_path):
     if len(encoder_list) < 1:
         print('No best_configs passed to resolution_comparison.')
     else:
@@ -95,7 +95,6 @@ def run(encoder_list):
         ax.set_xticklabels(keys, rotation = 45, fontsize = 10)
         # Create a horizontal line at the origin
         ax.axhline(y=0, color='black', label=H264.TAG, linestyle='--')
-        output_path = utilities.get_comparison_output_graph_path()
         plt.tick_params(axis='x', which='major', labelsize=10)
         
         x2_steps = []
@@ -121,6 +120,10 @@ def run(encoder_list):
         ax.legend()
         plt.gcf().subplots_adjust(bottom=0.15)
         plt.tight_layout()
+
+        if output_path == 'not_set':
+            output_path = utilities.get_joint_output_graph_path()
+
 
         if not os.path.isdir(output_path):
             os.mkdir(output_path)

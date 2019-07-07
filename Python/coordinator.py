@@ -204,7 +204,8 @@ if __name__ == '__main__':
 
             if not utilities.get_kitti_res_flag():
                 # Runs the plot_generator script to generate a performance graph of the current encoder and all resolutions
-                plot_generator.run(best_configs=best_configs, dataset=utilities.get_dataset_name(), codec=encoder.TAG)
+                plot_generator.run(best_configs=best_configs, dataset=utilities.get_dataset_name(), codec=encoder.TAG,
+                                   output_path = 'not_set')
 
             # Add an Encoder object after each encoders' full execution on a dataset
             joint_plot_encoders.append(utilities.Encoder(
@@ -213,5 +214,5 @@ if __name__ == '__main__':
                 dataset_name=utilities.get_dataset_name()))
             
         # Generate comparision graphs
-        joint_plot_generator.run(joint_plot_encoders)
-        resolution_comparison.run(joint_plot_encoders)
+        joint_plot_generator.run(joint_plot_encoders, output_path = 'not_set')
+        resolution_comparison.run(joint_plot_encoders, output_path = 'not_set')
